@@ -91,6 +91,17 @@
 
 (defvar mind-wave-server-port nil)
 
+(cl-defmacro mind-wave--with-file-buffer (filename &rest body)
+  "Evaluate BODY in buffer with FILEPATH."
+  (declare (indent 1))
+  `(cl-dolist (buffer (buffer-list))
+     (when-let* ((file-name (buffer-file-name buffer))
+                 (match-buffer (or (string-equal file-name ,filename)
+                                   (string-equal (file-truename file-name) ,filename))))
+       (with-current-buffer buffer
+         ,@body)
+       (cl-return))))
+
 (defun mind-wave--start-epc-server ()
   "Function to start the EPC server."
   (unless (process-live-p mind-wave-server)
@@ -272,18 +283,14 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-ask--response (filename answer total-tokens)
   (message "ChatGPT's answer this time consumed %s tokens" total-tokens)
-  (cl-dolist (buffer (buffer-list))
-    (when-let* ((file-name (buffer-file-name buffer))
-                (match-buffer (or (string-equal file-name filename)
-                                  (string-equal (file-truename file-name) filename))))
-      (with-current-buffer buffer
-        (save-excursion
-          (goto-char (point-max))
-          (insert "\n------ Assistant ------\n")
-          (insert (format "%s\n\n" answer))))
-      (cl-return)))
+  (mind-wave--with-file-buffer
+      filename
+    (save-excursion
+      (goto-char (point-max))
+      (insert "\n------ Assistant ------\n")
+      (insert (format "%s\n\n" answer)))
 
-  (goto-char (point-max)))
+    (goto-char (point-max))))
 
 (defun mind-wave-chat-change-system ()
   (interactive)
@@ -326,18 +333,14 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-translate-to-english--response (filename translate translate-start translate-end)
   (message "Translate done")
-  (cl-dolist (buffer (buffer-list))
-    (when-let* ((file-name (buffer-file-name buffer))
-                (match-buffer (or (string-equal file-name filename)
-                                  (string-equal (file-truename file-name) filename))))
-      (with-current-buffer buffer
-        (when (region-active-p)
-          (deactivate-mark))
+  (mind-wave--with-file-buffer
+      filename
+    (when (region-active-p)
+      (deactivate-mark))
 
-        (goto-char translate-start)
-        (delete-region translate-start translate-end)
-        (insert translate))
-      (cl-return))))
+    (goto-char translate-start)
+    (delete-region translate-start translate-end)
+    (insert translate)))
 
 (unless mind-wave-is-starting
   (mind-wave-start-process))
