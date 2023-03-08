@@ -270,12 +270,12 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                             promt
                             ))))
 
-(defun mind-wave-chat-answer (answer-file-name answer total-tokens)
+(defun mind-wave-chat-ask--response (filename answer total-tokens)
   (message "ChatGPT's answer this time consumed %s tokens" total-tokens)
   (cl-dolist (buffer (buffer-list))
     (when-let* ((file-name (buffer-file-name buffer))
-                (match-buffer (or (string-equal file-name answer-file-name)
-                                  (string-equal (file-truename file-name) answer-file-name))))
+                (match-buffer (or (string-equal file-name filename)
+                                  (string-equal (file-truename file-name) filename))))
       (with-current-buffer buffer
         (save-excursion
           (goto-char (point-max))
@@ -306,6 +306,38 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (message "Mind Wave mode disable"))
 
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
+
+(defun mind-wave-translate-to-english ()
+  (interactive)
+  (let (translate-start translate-end)
+    (if (region-active-p)
+        (progn
+          (setq translate-start (region-beginning))
+          (setq translate-end (region-end)))
+      (setq translate-start (beginning-of-thing 'sexp))
+      (setq translate-end (end-of-thing 'sexp)))
+
+    (message "Translate...")
+    (mind-wave-call-async "translate_to_english"
+                          (buffer-file-name)
+                          (mind-wave--encode-string (buffer-substring-no-properties translate-start translate-end))
+                          translate-start
+                          translate-end)))
+
+(defun mind-wave-translate-to-english--response (filename translate translate-start translate-end)
+  (message "Translate done")
+  (cl-dolist (buffer (buffer-list))
+    (when-let* ((file-name (buffer-file-name buffer))
+                (match-buffer (or (string-equal file-name filename)
+                                  (string-equal (file-truename file-name) filename))))
+      (with-current-buffer buffer
+        (when (region-active-p)
+          (deactivate-mark))
+
+        (goto-char translate-start)
+        (delete-region translate-start translate-end)
+        (insert translate))
+      (cl-return))))
 
 (unless mind-wave-is-starting
   (mind-wave-start-process))
