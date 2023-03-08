@@ -8,7 +8,7 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 ## 安装
 1. 注册 [OpenAI](https://platform.openai.com)
 2. 获取 [OpenAI API Key](https://platform.openai.com/account/api-keys)， 并将 API Key 保存到 `~/.emacs.d/mind-wave/chatgpt_api_key.txt` 文件中（请勿泄露 API Key 给他人）
-3. 安装 Python 依赖：`pip3 install openai`
+3. 安装 Python 依赖：`pip3 install openai epc sexpdata==0.0.3 six`
 4. 使用 `git clone` 下载此仓库，并替换下面配置中的 `load-path` 路径
 5. 将以下代码添加到您的配置文件 `~/.emacs` 中：
 ```elisp

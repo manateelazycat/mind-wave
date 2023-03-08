@@ -30,11 +30,6 @@ import sys
 
 from epc.client import EPCClient
 
-try:
-    import orjson as json_parser
-except:
-    import json as json_parser
-
 epc_client: Optional[EPCClient] = None
 
 # initialize logging, default to STDERR and INFO level
@@ -226,7 +221,4 @@ def get_emacs_version():
 
 def get_os_name():
     return platform.system().lower()
-
-def parse_json_content(content):
-    return json_parser.loads(content)
 
