@@ -24,7 +24,6 @@ import traceback
 import os
 import sys
 import base64
-from pathlib import Path
 from epc.server import ThreadingEPCServer
 from utils import (init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs)
 

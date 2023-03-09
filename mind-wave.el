@@ -346,6 +346,19 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-region translate-start translate-end)
     (insert translate)))
 
+(defun mind-wave-refactory-code ()
+  (interactive)
+  (let (code-start code-end)
+    (if (region-active-p)
+        (progn
+          (setq code-start (region-beginning))
+          (setq code-end (region-end)))
+      (setq code-start (beginning-of-thing 'sexp))
+      (setq code-end (end-of-thing 'sexp)))
+
+    (message "Refactoring...")
+    ))
+
 (unless mind-wave-is-starting
   (mind-wave-start-process))
 
