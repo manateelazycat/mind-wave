@@ -27,3 +27,7 @@ If you want to change the topic, create a new `*.chat` file and continue asking 
 ### Translation mode
 1. Select the content you want to translate (note that do not select too much, ChatGPT API has size limitations).
 2. Execute the command `mind-wave-translate-to-english`, ChatGPT will automatically replace the selected area with the translated content.
+
+### Refactoring Mode:
+1. Move the cursor to the function you want to refactor (or select specific code)
+2. Execute the command `mind-wave-refactory-code`, and ChatGPT will automatically split the screen, printing the refactored code and refactoring suggestions on the right side of the screen.

@@ -200,10 +200,46 @@ class MindWave:
 
     def do_translate_to_english(self, buffer_file_name, translate_text, translate_start, translate_end):
         text = base64.b64decode(translate_text).decode("utf-8")
-        (result, _) = self.send_completion_request([{"role": "system", "content": "You are an English teacher."},
-                                         {"role": "user", "content": "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式：\n{}".format(text)}])
+        (result, _) = self.send_completion_request(
+            [{"role": "system", "content": "You are an English teacher."},
+             {"role": "user", "content": "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式：\n{}".format(text)}])
 
         eval_in_emacs("mind-wave-translate-to-english--response", buffer_file_name, result, translate_start, translate_end)
+
+    def refactory_code(self, buffer_name, buffer_file_name, major_mode, code):
+        text = base64.b64decode(code).decode("utf-8")
+
+        messages = [{"role": "system", "content": "你是一个计算机教授"},
+                    {"role": "user", "content": "请帮我重构一下下面这段代码： \n{}".format(text)}]
+
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            import openai
+            openai.api_key = api_key
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                temperature=0,
+                stream=True)
+
+            for chunk in response:
+                delta = chunk.choices[0].delta
+                if len(delta) == 0:
+                    result_type = "end"
+                    result_content = ""
+                elif "role" in delta:
+                    result_type = "start"
+                    result_content = ""
+                elif "content" in delta:
+                    result_type = "content"
+                    result_content = delta["content"]
+
+                eval_in_emacs("mind-wave-refactory-code--response",
+                              buffer_file_name,
+                              "mind-wave-refactory-{}".format(buffer_name),
+                              major_mode,
+                              result_type,
+                              result_content)
 
     def cleanup(self):
         """Do some cleanup before exit python process."""

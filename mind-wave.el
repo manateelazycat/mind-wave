@@ -282,8 +282,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                             ))))
 
 (defun mind-wave-chat-ask--response (filename type answer)
-  (mind-wave--with-file-buffer
-      filename
+  (mind-wave--with-file-buffer filename
     (goto-char (point-max))
     (pcase type
       ("start"
@@ -353,11 +352,40 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (progn
           (setq code-start (region-beginning))
           (setq code-end (region-end)))
-      (setq code-start (beginning-of-thing 'sexp))
-      (setq code-end (end-of-thing 'sexp)))
+      (let ((function-node (treesit-parent-until
+                            (treesit-node-at (point))
+                            (lambda (parent)
+                              (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition"))))))
+        (setq code-start (treesit-node-start function-node))
+        (setq code-end (treesit-node-end function-node))))
 
     (message "Refactoring...")
-    ))
+    (mind-wave-call-async "refactory_code"
+                          (buffer-name)
+                          (buffer-file-name)
+                          (format "%s" major-mode)
+                          (mind-wave--encode-string (buffer-substring-no-properties code-start code-end)))))
+
+(defun mind-wave-refactory-code--response (filename buffername mode type answer)
+  (pcase type
+    ("start"
+     (mind-wave--with-file-buffer filename
+       (delete-other-windows)
+       (split-window-horizontally)
+       (other-window 1)
+       (get-buffer-create buffername)
+       (switch-to-buffer buffername)
+       (funcall (intern mode))
+       (message "ChatGPT refactoring...")))
+    ("content"
+     (save-excursion
+       (with-current-buffer (get-buffer-create buffername)
+         (insert answer))))
+    ("end"
+     (mind-wave--with-file-buffer filename
+       (select-window (get-buffer-window buffer)))
+     (message "ChatGPT refactory finish.")
+     )))
 
 (unless mind-wave-is-starting
   (mind-wave-start-process))
