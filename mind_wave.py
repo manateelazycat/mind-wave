@@ -110,22 +110,30 @@ class MindWave:
     def chat_ask(self, buffer_file_name, buffer_content, promt):
         api_key = self.chat_get_api_key()
         if api_key is not None:
-            completion_thread = threading.Thread(target=lambda: self.do_chat_ask(api_key, buffer_file_name, buffer_content, promt))
+            completion_thread = threading.Thread(target=lambda: self.do_chat_ask(buffer_file_name, buffer_content, promt))
             completion_thread.start()
             self.thread_queue.append(completion_thread)
 
-    def do_chat_ask(self, api_key, buffer_file_name, buffer_content, promt):
+    def send_request(self, messages):
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            import openai
+            openai.api_key = api_key
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages)
+
+            result = ''
+            for choice in response.choices:
+                result += choice.message.content
+
+            return (result, response)
+
+        return None
+
+    def do_chat_ask(self, buffer_file_name, buffer_content, promt):
         content = self.chat_parse_content(buffer_content)
-        import openai
-
-        openai.api_key = api_key
-        response = openai.ChatCompletion.create(
-            model = "gpt-3.5-turbo",
-            messages = content + [{"role": "user", "content": promt}])
-
-        result = ''
-        for choice in response.choices:
-            result += choice.message.content
+        (result, response) = self.send_request(content + [{"role": "user", "content": promt}])
 
         eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result, response.usage.total_tokens)
 
@@ -163,24 +171,14 @@ class MindWave:
         api_key = self.chat_get_api_key()
         if api_key is not None:
             completion_thread = threading.Thread(target=lambda: self.do_translate_to_english(
-                api_key, buffer_file_name, translate_text, translate_start, translate_end))
+                buffer_file_name, translate_text, translate_start, translate_end))
             completion_thread.start()
             self.thread_queue.append(completion_thread)
 
-    def do_translate_to_english(self, api_key, buffer_file_name, translate_text, translate_start, translate_end):
+    def do_translate_to_english(self, buffer_file_name, translate_text, translate_start, translate_end):
         text = base64.b64decode(translate_text).decode("utf-8")
-
-        import openai
-
-        openai.api_key = api_key
-        response = openai.ChatCompletion.create(
-            model = "gpt-3.5-turbo",
-            messages = [{"role": "system", "content": "You are an English teacher."},
-                        {"role": "user", "content": "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式：\n{}".format(text)}])
-
-        result = ''
-        for choice in response.choices:
-            result += choice.message.content
+        (result, _) = self.send_request([{"role": "system", "content": "You are an English teacher."},
+                                         {"role": "user", "content": "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式：\n{}".format(text)}])
 
         eval_in_emacs("mind-wave-translate-to-english--response", buffer_file_name, result, translate_start, translate_end)
 
