@@ -29,5 +29,9 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 2. 执行命令 `mind-wave-translate-to-english`，ChatGPT 获得翻译后会自动替换选中区域的内容。
 
 ### 重构模式
-1. 光标移动到想要重构的函数（也可以选中特定的代码）
+1. 光标移动到想要重构的函数
 2. 执行命令 `mind-wave-refactory-code`, ChatGPT 会自动分屏， 在屏幕右边打印重构的代码和重构建议
+
+### 注释模式
+1. 光标移动到想要添加注释的函数
+2. 执行命令 `mind-wave-comment-code`, ChatGPT 会自动分屏， 在屏幕右边打印带注释的代码

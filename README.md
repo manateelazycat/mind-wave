@@ -24,10 +24,10 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 
 If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT.
 
-### Translation mode
-1. Select the content you want to translate (note that do not select too much, ChatGPT API has size limitations).
-2. Execute the command `mind-wave-translate-to-english`, ChatGPT will automatically replace the selected area with the translated content.
+### 重构模式
+1. 光标移动到想要重构的函数
+2. 执行命令 `mind-wave-refactory-code`, ChatGPT 会自动分屏， 在屏幕右边打印重构的代码和重构建议
 
-### Refactoring Mode:
-1. Move the cursor to the function you want to refactor (or select specific code)
-2. Execute the command `mind-wave-refactory-code`, and ChatGPT will automatically split the screen, printing the refactored code and refactoring suggestions on the right side of the screen.
+### 注释模式
+1. 光标移动到想要添加注释的函数
+2. 执行命令 `mind-wave-comment-code`, ChatGPT 会自动分屏， 在屏幕右边打印带注释的代码

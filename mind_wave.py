@@ -241,6 +241,41 @@ class MindWave:
                               result_type,
                               result_content)
 
+    def comment_code(self, buffer_name, buffer_file_name, major_mode, code):
+        text = base64.b64decode(code).decode("utf-8")
+
+        messages = [{"role": "system", "content": "你是一个计算机教授"},
+                    {"role": "user", "content": "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码： \n{}".format(text)}]
+
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            import openai
+            openai.api_key = api_key
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                temperature=0,
+                stream=True)
+
+            for chunk in response:
+                delta = chunk.choices[0].delta
+                if len(delta) == 0:
+                    result_type = "end"
+                    result_content = ""
+                elif "role" in delta:
+                    result_type = "start"
+                    result_content = ""
+                elif "content" in delta:
+                    result_type = "content"
+                    result_content = delta["content"]
+
+                eval_in_emacs("mind-wave-comment-code--response",
+                              buffer_file_name,
+                              "mind-wave-comment-{}".format(buffer_name),
+                              major_mode,
+                              result_type,
+                              result_content)
+
     def cleanup(self):
         """Do some cleanup before exit python process."""
         close_epc_client()

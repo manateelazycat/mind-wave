@@ -387,6 +387,48 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
      (message "ChatGPT refactory finish.")
      )))
 
+(defun mind-wave-comment-code ()
+  (interactive)
+  (let (code-start code-end)
+    (if (region-active-p)
+        (progn
+          (setq code-start (region-beginning))
+          (setq code-end (region-end)))
+      (let ((function-node (treesit-parent-until
+                            (treesit-node-at (point))
+                            (lambda (parent)
+                              (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition"))))))
+        (setq code-start (treesit-node-start function-node))
+        (setq code-end (treesit-node-end function-node))))
+
+    (message "Commenting...")
+    (mind-wave-call-async "comment_code"
+                          (buffer-name)
+                          (buffer-file-name)
+                          (format "%s" major-mode)
+                          (mind-wave--encode-string (buffer-substring-no-properties code-start code-end)))))
+
+(defun mind-wave-comment-code--response (filename buffername mode type answer)
+  (pcase type
+    ("start"
+     (mind-wave--with-file-buffer filename
+       (delete-other-windows)
+       (split-window-horizontally)
+       (other-window 1)
+       (get-buffer-create buffername)
+       (switch-to-buffer buffername)
+       (funcall (intern mode))
+       (message "ChatGPT commenting...")))
+    ("content"
+     (save-excursion
+       (with-current-buffer (get-buffer-create buffername)
+         (insert answer))))
+    ("end"
+     (mind-wave--with-file-buffer filename
+       (select-window (get-buffer-window buffer)))
+     (message "ChatGPT comment finish.")
+     )))
+
 (unless mind-wave-is-starting
   (mind-wave-start-process))
 
