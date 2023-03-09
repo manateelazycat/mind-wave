@@ -101,6 +101,8 @@ class MindWave:
                 api_key = f.read().strip()
                 if api_key != "":
                     return api_key
+        else:
+            return os.environ.get("OPENAI_API_KEY", None)
 
         message_emacs("ChatGPT API key not exist, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {}".format(
             mind_wave_chat_api_key_file_path))
