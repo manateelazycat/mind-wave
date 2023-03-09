@@ -319,23 +319,40 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-translate-to-english ()
   (interactive)
-  (let (translate-start translate-end)
-    (if (region-active-p)
-        (progn
-          (setq translate-start (region-beginning))
-          (setq translate-end (region-end)))
-      (setq translate-start (beginning-of-thing 'sexp))
-      (setq translate-end (end-of-thing 'sexp)))
-
+  (let* ((info (mind-wave-get-region-or-sexp))
+         (translate-start (nth 0 info))
+         (translate-end (nth 1 info))
+         (translate-text (nth 2 info)))
     (message "Translate...")
-    (mind-wave-call-async "translate_to_english"
+    (mind-wave-call-async "adjust_text"
                           (buffer-file-name)
-                          (mind-wave--encode-string (buffer-substring-no-properties translate-start translate-end))
+                          (mind-wave--encode-string translate-text)
                           translate-start
-                          translate-end)))
+                          translate-end
+                          "You are an English teacher."
+                          "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式"
+                          "Translate done"
+                          )))
 
-(defun mind-wave-translate-to-english--response (filename translate translate-start translate-end)
-  (message "Translate done")
+(defun mind-wave-proofreading-doc ()
+  (interactive)
+  (let* ((info (mind-wave-get-region-or-sexp))
+         (translate-start (nth 0 info))
+         (translate-end (nth 1 info))
+         (translate-text (nth 2 info)))
+    (message "Proofreading...")
+    (mind-wave-call-async "adjust_text"
+                          (buffer-file-name)
+                          (mind-wave--encode-string translate-text)
+                          translate-start
+                          translate-end
+                          "你是一个高水平的作家"
+                          "请帮我润色一下下面这段话"
+                          "Proofread done"
+                          )))
+
+(defun mind-wave-adjust-text--response (filename translate translate-start translate-end notify-end)
+  (message notify-end)
   (mind-wave--with-file-buffer
       filename
     (when (region-active-p)
@@ -344,6 +361,17 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (goto-char translate-start)
     (delete-region translate-start translate-end)
     (insert translate)))
+
+(defun mind-wave-get-region-or-sexp ()
+  (let (translate-start translate-end)
+    (if (region-active-p)
+        (progn
+          (setq translate-start (region-beginning))
+          (setq translate-end (region-end)))
+      (setq translate-start (beginning-of-thing 'sexp))
+      (setq translate-end (end-of-thing 'sexp)))
+
+    (list translate-start translate-end (buffer-substring-no-properties translate-start translate-end))))
 
 (defun mind-wave-get-function-node ()
   (treesit-parent-until

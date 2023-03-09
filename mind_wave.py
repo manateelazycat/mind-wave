@@ -197,21 +197,21 @@ class MindWave:
 
         return messages
 
-    def translate_to_english(self, buffer_file_name, translate_text, translate_start, translate_end):
+    def adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, promt, notify_end):
         api_key = self.chat_get_api_key()
         if api_key is not None:
-            completion_thread = threading.Thread(target=lambda: self.do_translate_to_english(
-                buffer_file_name, translate_text, translate_start, translate_end))
+            completion_thread = threading.Thread(target=lambda: self.do_adjust_text(
+                buffer_file_name, text_content, text_start, text_end, role, promt, notify_end))
             completion_thread.start()
             self.thread_queue.append(completion_thread)
 
-    def do_translate_to_english(self, buffer_file_name, translate_text, translate_start, translate_end):
-        text = base64.b64decode(translate_text).decode("utf-8")
+    def do_adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, promt, notify_end):
+        text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
-            [{"role": "system", "content": "You are an English teacher."},
-             {"role": "user", "content": "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式：\n{}".format(text)}])
+            [{"role": "system", "content": role},
+             {"role": "user", "content": "{}：\n{}".format(promt, text)}])
 
-        eval_in_emacs("mind-wave-translate-to-english--response", buffer_file_name, result, translate_start, translate_end)
+        eval_in_emacs("mind-wave-adjust-text--response", buffer_file_name, result, text_start, text_end, notify_end)
 
     def action_code(self, buffer_name, buffer_file_name, major_mode, code, promt, callback_template, notify_start, notify_end):
         text = base64.b64decode(code).decode("utf-8")

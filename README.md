@@ -24,6 +24,12 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 
 If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT.
 
+### 文档模式
+选中内容（请注意，不要选择太多，ChatGPT 的 API 有大小限制）
+
+1. 执行命令 `mind-wave-translate-to-english`，ChatGPT 获得翻译后会自动替换选中区域的内容。
+1. 执行命令 `mind-wave-proofreading-doc`，ChatGPT 会用润色后的文档自动替换选中区域的内容。
+
 ### Code Refactoring Mode
 Move the cursor to the desired function for refactoring.
 
