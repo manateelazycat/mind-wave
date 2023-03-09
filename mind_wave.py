@@ -132,10 +132,7 @@ class MindWave:
 
         return None
 
-    def do_chat_ask(self, buffer_file_name, buffer_content, promt):
-        content = self.chat_parse_content(buffer_content)
-
-        messages = content + [{"role": "user", "content": promt}]
+    def send_stream_request(self, messages, callback):
         api_key = self.chat_get_api_key()
         if api_key is not None:
             import openai
@@ -158,7 +155,17 @@ class MindWave:
                     result_type = "content"
                     result_content = delta["content"]
 
-                eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result_type, result_content)
+                callback(result_type, result_content)
+
+    def do_chat_ask(self, buffer_file_name, buffer_content, promt):
+        content = self.chat_parse_content(buffer_content)
+
+        messages = content + [{"role": "user", "content": promt}]
+
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result_type, result_content)
+
+        self.send_stream_request(messages, callback)
 
     def chat_parse_content(self, buffer_content):
         text = base64.b64decode(buffer_content).decode("utf-8")
@@ -212,34 +219,15 @@ class MindWave:
         messages = [{"role": "system", "content": "你是一个计算机教授"},
                     {"role": "user", "content": "请帮我重构一下下面这段代码： \n{}".format(text)}]
 
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            import openai
-            openai.api_key = api_key
-            response = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo",
-                messages = messages,
-                temperature=0,
-                stream=True)
-
-            for chunk in response:
-                delta = chunk.choices[0].delta
-                if len(delta) == 0:
-                    result_type = "end"
-                    result_content = ""
-                elif "role" in delta:
-                    result_type = "start"
-                    result_content = ""
-                elif "content" in delta:
-                    result_type = "content"
-                    result_content = delta["content"]
-
-                eval_in_emacs("mind-wave-refactory-code--response",
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-refactory-code--response",
                               buffer_file_name,
                               "mind-wave-refactory-{}".format(buffer_name),
                               major_mode,
                               result_type,
                               result_content)
+
+        self.send_stream_request(messages, callback)
 
     def comment_code(self, buffer_name, buffer_file_name, major_mode, code):
         text = base64.b64decode(code).decode("utf-8")
@@ -247,34 +235,15 @@ class MindWave:
         messages = [{"role": "system", "content": "你是一个计算机教授"},
                     {"role": "user", "content": "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码： \n{}".format(text)}]
 
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            import openai
-            openai.api_key = api_key
-            response = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo",
-                messages = messages,
-                temperature=0,
-                stream=True)
-
-            for chunk in response:
-                delta = chunk.choices[0].delta
-                if len(delta) == 0:
-                    result_type = "end"
-                    result_content = ""
-                elif "role" in delta:
-                    result_type = "start"
-                    result_content = ""
-                elif "content" in delta:
-                    result_type = "content"
-                    result_content = delta["content"]
-
-                eval_in_emacs("mind-wave-comment-code--response",
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-comment-code--response",
                               buffer_file_name,
                               "mind-wave-comment-{}".format(buffer_name),
                               major_mode,
                               result_type,
                               result_content)
+
+        self.send_stream_request(messages, callback)
 
     def cleanup(self):
         """Do some cleanup before exit python process."""

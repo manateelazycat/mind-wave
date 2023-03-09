@@ -345,6 +345,12 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-region translate-start translate-end)
     (insert translate)))
 
+(defun mind-wave-get-function-node ()
+  (treesit-parent-until
+   (treesit-node-at (point))
+   (lambda (parent)
+     (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition")))))
+
 (defun mind-wave-refactory-code ()
   (interactive)
   (let (code-start code-end)
@@ -352,10 +358,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (progn
           (setq code-start (region-beginning))
           (setq code-end (region-end)))
-      (let ((function-node (treesit-parent-until
-                            (treesit-node-at (point))
-                            (lambda (parent)
-                              (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition"))))))
+      (let ((function-node (mind-wave-get-function-node)))
         (setq code-start (treesit-node-start function-node))
         (setq code-end (treesit-node-end function-node))))
 
@@ -366,7 +369,13 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (format "%s" major-mode)
                           (mind-wave--encode-string (buffer-substring-no-properties code-start code-end)))))
 
-(defun mind-wave-refactory-code--response (filename buffername mode type answer)
+(defun mind-wave-split-window--response (filename
+                                         buffername
+                                         mode
+                                         type
+                                         answer
+                                         start-message
+                                         end-message)
   (pcase type
     ("start"
      (mind-wave--with-file-buffer filename
@@ -376,7 +385,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
        (get-buffer-create buffername)
        (switch-to-buffer buffername)
        (funcall (intern mode))
-       (message "ChatGPT refactoring...")))
+       (message start-message)))
     ("content"
      (save-excursion
        (with-current-buffer (get-buffer-create buffername)
@@ -384,8 +393,13 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     ("end"
      (mind-wave--with-file-buffer filename
        (select-window (get-buffer-window buffer)))
-     (message "ChatGPT refactory finish.")
+     (message end-message)
      )))
+
+(defun mind-wave-refactory-code--response (filename buffername mode type answer)
+  (mind-wave-split-window--response filename buffername mode type answer
+                                    "ChatGPT refactoring..."
+                                    "ChatGPT refactory finish."))
 
 (defun mind-wave-comment-code ()
   (interactive)
@@ -394,10 +408,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (progn
           (setq code-start (region-beginning))
           (setq code-end (region-end)))
-      (let ((function-node (treesit-parent-until
-                            (treesit-node-at (point))
-                            (lambda (parent)
-                              (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition"))))))
+      (let ((function-node (mind-wave-get-function-node)))
         (setq code-start (treesit-node-start function-node))
         (setq code-end (treesit-node-end function-node))))
 
@@ -409,25 +420,9 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (mind-wave--encode-string (buffer-substring-no-properties code-start code-end)))))
 
 (defun mind-wave-comment-code--response (filename buffername mode type answer)
-  (pcase type
-    ("start"
-     (mind-wave--with-file-buffer filename
-       (delete-other-windows)
-       (split-window-horizontally)
-       (other-window 1)
-       (get-buffer-create buffername)
-       (switch-to-buffer buffername)
-       (funcall (intern mode))
-       (message "ChatGPT commenting...")))
-    ("content"
-     (save-excursion
-       (with-current-buffer (get-buffer-create buffername)
-         (insert answer))))
-    ("end"
-     (mind-wave--with-file-buffer filename
-       (select-window (get-buffer-window buffer)))
-     (message "ChatGPT comment finish.")
-     )))
+  (mind-wave-split-window--response filename buffername mode type answer
+                                    "ChatGPT commenting..."
+                                    "ChatGPT comment finish."))
 
 (unless mind-wave-is-starting
   (mind-wave-start-process))
