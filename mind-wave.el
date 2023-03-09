@@ -284,16 +284,17 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-chat-ask--response (filename type answer)
   (mind-wave--with-file-buffer
       filename
-    (save-excursion
-      (goto-char (point-max))
-      (pcase type
-        ("start"
-         (insert "\n------ Assistant ------\n"))
-        ("content"
-         (insert answer))
-        ("end"
-         (insert "\n\n")
-         )))))
+    (goto-char (point-max))
+    (pcase type
+      ("start"
+       (insert "\n------ Assistant ------\n")
+       (message "ChatGPT speaking..."))
+      ("content"
+       (insert answer))
+      ("end"
+       (insert "\n\n")
+       (message "ChatGPT response finish.")
+       ))))
 
 (defun mind-wave-chat-change-system ()
   (interactive)
