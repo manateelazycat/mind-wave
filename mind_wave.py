@@ -213,35 +213,21 @@ class MindWave:
 
         eval_in_emacs("mind-wave-translate-to-english--response", buffer_file_name, result, translate_start, translate_end)
 
-    def refactory_code(self, buffer_name, buffer_file_name, major_mode, code):
+    def action_code(self, buffer_name, buffer_file_name, major_mode, code, promt, callback_template, notify_start, notify_end):
         text = base64.b64decode(code).decode("utf-8")
 
         messages = [{"role": "system", "content": "你是一个计算机教授"},
-                    {"role": "user", "content": "请帮我重构一下下面这段代码： \n{}".format(text)}]
+                    {"role": "user", "content": "{}： \n{}".format(promt, text)}]
 
         def callback(result_type, result_content):
-            eval_in_emacs("mind-wave-refactory-code--response",
-                              buffer_file_name,
-                              "mind-wave-refactory-{}".format(buffer_name),
-                              major_mode,
-                              result_type,
-                              result_content)
-
-        self.send_stream_request(messages, callback)
-
-    def comment_code(self, buffer_name, buffer_file_name, major_mode, code):
-        text = base64.b64decode(code).decode("utf-8")
-
-        messages = [{"role": "system", "content": "你是一个计算机教授"},
-                    {"role": "user", "content": "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码： \n{}".format(text)}]
-
-        def callback(result_type, result_content):
-            eval_in_emacs("mind-wave-comment-code--response",
-                              buffer_file_name,
-                              "mind-wave-comment-{}".format(buffer_name),
-                              major_mode,
-                              result_type,
-                              result_content)
+            eval_in_emacs("mind-wave-split-window--response",
+                          buffer_file_name,
+                          "mind-wave-{}-{}".format(callback_template, buffer_name),
+                          major_mode,
+                          result_type,
+                          result_content,
+                          notify_start,
+                          notify_end)
 
         self.send_stream_request(messages, callback)
 

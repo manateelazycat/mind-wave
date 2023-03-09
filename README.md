@@ -24,10 +24,9 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 
 If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT.
 
-### 重构模式
-1. 光标移动到想要重构的函数
-2. 执行命令 `mind-wave-refactory-code`, ChatGPT 会自动分屏， 在屏幕右边打印重构的代码和重构建议
+### Code Refactoring Mode
+Move the cursor to the desired function for refactoring.
 
-### 注释模式
-1. 光标移动到想要添加注释的函数
-2. 执行命令 `mind-wave-comment-code`, ChatGPT 会自动分屏， 在屏幕右边打印带注释的代码
+1. Execute the command `mind-wave-refactory-code`, ChatGPT will automatically split the screen to display the refactored code and suggestions for improvement on the right.
+2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
+3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.

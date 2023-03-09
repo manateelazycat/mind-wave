@@ -351,8 +351,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
    (lambda (parent)
      (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition")))))
 
-(defun mind-wave-refactory-code ()
-  (interactive)
+(defun mind-wave-get-function-string ()
   (let (code-start code-end)
     (if (region-active-p)
         (progn
@@ -362,12 +361,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (setq code-start (treesit-node-start function-node))
         (setq code-end (treesit-node-end function-node))))
 
-    (message "Refactoring...")
-    (mind-wave-call-async "refactory_code"
-                          (buffer-name)
-                          (buffer-file-name)
-                          (format "%s" major-mode)
-                          (mind-wave--encode-string (buffer-substring-no-properties code-start code-end)))))
+    (buffer-substring-no-properties code-start code-end)))
 
 (defun mind-wave-split-window--response (filename
                                          buffername
@@ -396,33 +390,44 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
      (message end-message)
      )))
 
-(defun mind-wave-refactory-code--response (filename buffername mode type answer)
-  (mind-wave-split-window--response filename buffername mode type answer
-                                    "ChatGPT refactoring..."
-                                    "ChatGPT refactory finish."))
+(defun mind-wave-refactory-code ()
+  (interactive)
+  (message "Refactoring...")
+  (mind-wave-call-async "action_code"
+                        (buffer-name)
+                        (buffer-file-name)
+                        (format "%s" major-mode)
+                        (mind-wave--encode-string (mind-wave-get-function-string))
+                        "请帮我重构一下下面这段代码"
+                        "refactory"
+                        "ChatGPT refactoring..."
+                        "ChatGPT refactory finish."))
 
 (defun mind-wave-comment-code ()
   (interactive)
-  (let (code-start code-end)
-    (if (region-active-p)
-        (progn
-          (setq code-start (region-beginning))
-          (setq code-end (region-end)))
-      (let ((function-node (mind-wave-get-function-node)))
-        (setq code-start (treesit-node-start function-node))
-        (setq code-end (treesit-node-end function-node))))
+  (message "Commenting...")
+  (mind-wave-call-async "action_code"
+                        (buffer-name)
+                        (buffer-file-name)
+                        (format "%s" major-mode)
+                        (mind-wave--encode-string (mind-wave-get-function-string))
+                        "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码"
+                        "comment"
+                        "ChatGPT commenting..."
+                        "ChatGPT comment finish."))
 
-    (message "Commenting...")
-    (mind-wave-call-async "comment_code"
-                          (buffer-name)
-                          (buffer-file-name)
-                          (format "%s" major-mode)
-                          (mind-wave--encode-string (buffer-substring-no-properties code-start code-end)))))
-
-(defun mind-wave-comment-code--response (filename buffername mode type answer)
-  (mind-wave-split-window--response filename buffername mode type answer
-                                    "ChatGPT commenting..."
-                                    "ChatGPT comment finish."))
+(defun mind-wave-explain-code ()
+  (interactive)
+  (message "Explaining...")
+  (mind-wave-call-async "action_code"
+                        (buffer-name)
+                        (buffer-file-name)
+                        (format "%s" major-mode)
+                        (mind-wave--encode-string (mind-wave-get-function-string))
+                        "请详细解释一下下面这段代码的意思"
+                        "explain"
+                        "ChatGPT explaining..."
+                        "ChatGPT explain finish."))
 
 (unless mind-wave-is-starting
   (mind-wave-start-process))
