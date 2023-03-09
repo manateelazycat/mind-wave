@@ -95,18 +95,19 @@ class MindWave:
         user_emacs_dir = get_emacs_func_result("get-user-emacs-directory")
         mind_wave_dir = os.path.join(user_emacs_dir, "mind-wave")
         mind_wave_chat_api_key_file_path = os.path.join(mind_wave_dir, "chatgpt_api_key.txt")
+        key = None
         if os.path.exists(mind_wave_chat_api_key_file_path):
             with open(mind_wave_chat_api_key_file_path, "r") as f:
                 api_key = f.read().strip()
                 if api_key != "":
-                    return api_key
+                    key = api_key
         else:
-            return os.environ.get("OPENAI_API_KEY", None)
+            key = os.environ.get("OPENAI_API_KEY")
 
-        message_emacs("ChatGPT API key not exist, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {}".format(
-            mind_wave_chat_api_key_file_path))
+        if key is None:
+                message_emacs("ChatGPT API key not found, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {}. Or set the enviroment OPENAI_API_KEY".format(mind_wave_chat_api_key_file_path))
 
-        return None
+        return key
 
     def chat_ask(self, buffer_file_name, buffer_content, promt):
         api_key = self.chat_get_api_key()
