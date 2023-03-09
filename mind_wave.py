@@ -114,7 +114,7 @@ class MindWave:
             completion_thread.start()
             self.thread_queue.append(completion_thread)
 
-    def send_request(self, messages):
+    def send_completion_request(self, messages):
         api_key = self.chat_get_api_key()
         if api_key is not None:
             import openai
@@ -133,9 +133,31 @@ class MindWave:
 
     def do_chat_ask(self, buffer_file_name, buffer_content, promt):
         content = self.chat_parse_content(buffer_content)
-        (result, response) = self.send_request(content + [{"role": "user", "content": promt}])
 
-        eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result, response.usage.total_tokens)
+        messages = content + [{"role": "user", "content": promt}]
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            import openai
+            openai.api_key = api_key
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                temperature=0,
+                stream=True)
+
+            for chunk in response:
+                delta = chunk.choices[0].delta
+                if len(delta) == 0:
+                    result_type = "end"
+                    result_content = ""
+                elif "role" in delta:
+                    result_type = "start"
+                    result_content = ""
+                elif "content" in delta:
+                    result_type = "content"
+                    result_content = delta["content"]
+
+                eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result_type, result_content)
 
     def chat_parse_content(self, buffer_content):
         text = base64.b64decode(buffer_content).decode("utf-8")
@@ -177,7 +199,7 @@ class MindWave:
 
     def do_translate_to_english(self, buffer_file_name, translate_text, translate_start, translate_end):
         text = base64.b64decode(translate_text).decode("utf-8")
-        (result, _) = self.send_request([{"role": "system", "content": "You are an English teacher."},
+        (result, _) = self.send_completion_request([{"role": "system", "content": "You are an English teacher."},
                                          {"role": "user", "content": "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式：\n{}".format(text)}])
 
         eval_in_emacs("mind-wave-translate-to-english--response", buffer_file_name, result, translate_start, translate_end)
