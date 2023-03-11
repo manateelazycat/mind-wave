@@ -198,6 +198,21 @@ class MindWave:
 
         return messages
 
+    def parse_title(self, buffer_file_name, text_content):
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            completion_thread = threading.Thread(target=lambda: self.do_parse_title(buffer_file_name, text_content))
+            completion_thread.start()
+            self.thread_queue.append(completion_thread)
+
+    def do_parse_title(self, buffer_file_name, text_content):
+        text = base64.b64decode(text_content).decode("utf-8")
+        (result, _) = self.send_completion_request(
+            [{"role": "system", "content": "你是一个语言学家"},
+             {"role": "user", "content": "{}：\n{}".format("给下面这段话起一个标题", text)}])
+
+        eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
+
     def adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, promt, notify_end):
         api_key = self.chat_get_api_key()
         if api_key is not None:

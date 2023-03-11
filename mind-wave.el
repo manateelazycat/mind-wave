@@ -301,8 +301,24 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
        (insert answer))
       ("end"
        (insert "\n\n")
+       (mind-wave-rename)
        (message "ChatGPT response finish.")
        ))))
+
+(defun mind-wave-rename ()
+  (let ((buffername (buffer-name)))
+    (unless (and (string-prefix-p "#" buffername)
+                 (string-suffix-p "#" buffername))
+      (mind-wave-call-async "parse_title"
+                            (buffer-file-name)
+                            (mind-wave--encode-string (buffer-string))))))
+
+(defun mind-wave-parse-title--response (filename title)
+  (mind-wave--with-file-buffer
+      filename
+    (set-visited-file-name (format "#%s#.chat" title))
+    (delete-file filename)
+    (save-buffer)))
 
 (defun mind-wave-chat-change-system ()
   (interactive)
