@@ -258,28 +258,37 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defvar mind-wave-chat-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-j" #'mind-wave-chat-ask)
+    (define-key map "\C-h" #'mind-wave-chat-continue)
     (define-key map "\C-i" #'mind-wave-chat-change-system)
     map)
   "Mind Wave Chat Keymap")
 
+(defun mind-wave-chat-ask-with-message (prompt)
+  (save-excursion
+    (goto-char (point-max))
+    (unless (equal (point) (point-min))
+      (insert "\n"))
+    (insert "------ User ------\n")
+    (insert (format "%s\n\n" prompt)))
+
+  (message "Wait ChatGPT...")
+  (mind-wave-call-async "chat_ask"
+                        (buffer-file-name)
+                        (mind-wave--encode-string (buffer-string))
+                        prompt
+                        ))
+
 (defun mind-wave-chat-ask ()
   (interactive)
-  (let ((promt (read-string "Ask ChatGPT: ")))
-    (if (string-empty-p (string-trim promt))
+  (let ((prompt (read-string "Ask ChatGPT: ")))
+    (if (string-empty-p (string-trim prompt))
         (message "Please don't send empty question.")
-      (save-excursion
-        (goto-char (point-max))
-        (unless (equal (point) (point-min))
-          (insert "\n"))
-        (insert "------ User ------\n")
-        (insert (format "%s\n\n" promt)))
+      (mind-wave-chat-ask-with-message prompt)
+      )))
 
-      (message "Wait ChatGPT...")
-      (mind-wave-call-async "chat_ask"
-                            (buffer-file-name)
-                            (mind-wave--encode-string (buffer-string))
-                            promt
-                            ))))
+(defun mind-wave-chat-continue ()
+  (interactive)
+  (mind-wave-chat-ask-with-message "继续"))
 
 (defun mind-wave-chat-ask--response (filename type answer)
   (mind-wave--with-file-buffer filename
