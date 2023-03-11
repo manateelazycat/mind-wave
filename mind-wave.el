@@ -308,7 +308,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-rename ()
   (let ((buffername (buffer-name)))
     (unless (and (string-prefix-p "#" buffername)
-                 (string-suffix-p "#" buffername))
+                 (string-suffix-p "#.chat" buffername))
       (mind-wave-call-async "parse_title"
                             (buffer-file-name)
                             (mind-wave--encode-string (buffer-string))))))
