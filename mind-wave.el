@@ -278,10 +278,15 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-j")   #'mind-wave-chat-ask)
     (define-key map (kbd "C-S-j") #'mind-wave-chat-ask-with-multiline)
+    (define-key map (kbd "C-,")   #'mind-wave-chat-ask-insert-line)
+    (define-key map (kbd "C-S-m") #'mind-wave-chat-ask-send-buffer)
     (define-key map (kbd "C-u")   #'mind-wave-chat-continue)
     (define-key map (kbd "C-i")   #'mind-wave-chat-generate-title)
     map)
   "Mind Wave Chat Keymap")
+
+(defun mind-wave-get-buffer-string ()
+  (buffer-substring-no-properties (point-min) (point-max)))
 
 (defun mind-wave-chat-ask-with-message (prompt)
   (save-excursion
@@ -294,7 +299,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (message "Wait ChatGPT...")
   (mind-wave-call-async "chat_ask"
                         (buffer-file-name)
-                        (mind-wave--encode-string (buffer-string))
+                        (mind-wave--encode-string (mind-wave-get-buffer-string))
                         prompt
                         ))
 
@@ -305,6 +310,21 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (message "Please don't send empty question.")
       (mind-wave-chat-ask-with-message prompt)
       )))
+
+(defun mind-wave-chat-ask-insert-line ()
+  (interactive)
+  (insert "\n------ User ------\n")
+  (message "[Mind-Wave] Continue input, do `mind-wave-chat-ask-send-buffer` when finish input."))
+
+(defun mind-wave-chat-ask-send-buffer ()
+  (interactive)
+  (insert "\n")
+  (message "Wait ChatGPT...")
+  (mind-wave-call-async "chat_ask"
+                        (buffer-file-name)
+                        (mind-wave--encode-string (mind-wave-get-buffer-string))
+                        ""
+                        ))
 
 (defun mind-wave-chat-ask-with-multiline ()
   (interactive)
@@ -344,7 +364,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-edit-mode-confirm ()
   (interactive)
   (let* ((bufname mind-wave-edit-buffer-name)
-         (prompt (buffer-substring-no-properties (point-min) (point-max))))
+         (prompt (mind-wave-get-buffer-string)))
     (kill-buffer)
     (delete-window)
 
@@ -384,7 +404,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
             force)
     (mind-wave-call-async "parse_title"
                           (buffer-file-name)
-                          (mind-wave--encode-string (buffer-string)))))
+                          (mind-wave--encode-string (mind-wave-get-buffer-string)))))
 
 (defun mind-wave-parse-title--response (filename title)
   (mind-wave--with-file-buffer
@@ -424,7 +444,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           translate-start
                           translate-end
                           "You are an English translator"
-                          "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is"
+                          "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. If the input content is Markdown syntax, output use Markdown syntax too. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is"
                           "Translate done"
                           )))
 

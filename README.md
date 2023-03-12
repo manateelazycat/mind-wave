@@ -18,14 +18,19 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 ```
 
 ## Usage
-### Conversation Mode:
-1. Create a new file named `test.chat` to automatically enter `mind-wave-chat-mode`. 
-2. Execute the `mind-wave-chat-ask` command (press Ctrl + j), input your question and wait for ChatGPT's answer. 
-3. Execute `mind-wave-chat-continue` command (press Ctrl + u) to continue the conversation. 
-4. Execute `mind-wave-chat-generate-title` command (press Ctrl + i) to generate a new title based on the content.
-5. Execute the command `mind-wave-chat-ask-with-multiline` (press Ctrl + Shift + j), enter multiple questions and wait for ChatGPT to answer.
+### Conversation Mode
+1. Create a `test.chat` file to automatically enter `mind-wave-chat-mode`.
+2. Execute the command `mind-wave-chat-ask` (press Ctrl + j), input your question, and wait for ChatGPT to respond.
+3. Execute the command `mind-wave-chat-continue` (press Ctrl + u) to continue the conversation.
+4. Execute the command `mind-wave-chat-generate-title` (press Ctrl + i) to generate a new title based on the content.
 
-If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT.
+If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT questions.
+
+### Multi-line Input
+There are two ways of inputting multi-line content:
+
+1. Execute the command `mind-wave-chat-ask-with-multiline` (press Ctrl + Shift + j), input multiple questions, and wait for ChatGPT to respond.
+2. Execute the command `mind-wave-chat-ask-insert-line` to insert the `----- User ------` separator, continue inputting multiple lines in the buffer, and finally execute `mind-wave-chat-ask-send-buffer`.
 
 ### Document mode
 选中内容（请注意，不要选择太多，ChatGPT 的 API 有大小限制）

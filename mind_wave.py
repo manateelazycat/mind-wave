@@ -164,7 +164,10 @@ class MindWave:
     def chat_ask(self, buffer_file_name, buffer_content, prompt):
         content = self.chat_parse_content(buffer_content)
 
-        messages = content + [{"role": "user", "content": prompt}]
+        if prompt != "":
+            messages = content + [{"role": "user", "content": prompt}]
+        else:
+            messages = content
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result_type, result_content)
