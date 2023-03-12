@@ -374,8 +374,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (mind-wave--encode-string translate-text)
                           translate-start
                           translate-end
-                          "You are an English teacher."
-                          "请帮我把下面这段话翻译成英文， 结果不要带引号， 保持同样的格式"
+                          "You are an English translator"
+                          "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is"
                           "Translate done"
                           )))
 
