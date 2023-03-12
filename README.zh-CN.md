@@ -23,6 +23,7 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 2. 执行命令 `mind-wave-chat-ask`（按下 Ctrl + j），输入问题，等待 ChatGPT 回答
 3. 执行命令 `mind-wave-chat-continue` (按下 Ctrl + u), 继续回答
 4. 执行命令 `mind-wave-chat-generate-title` (按下 Ctrl + i), 根据内容重新生成标题
+5. 执行命令 `mind-wave-chat-ask-with-multiline`（按下 Ctrl + Shift + j），输入多行问题，等待 ChatGPT 回答
 
 如果您想更换话题，请新建一个新的 `*.chat` 文件，然后继续向 ChatGPT 提问即可。
 

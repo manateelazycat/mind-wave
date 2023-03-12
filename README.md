@@ -23,6 +23,7 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 2. Execute the `mind-wave-chat-ask` command (press Ctrl + j), input your question and wait for ChatGPT's answer. 
 3. Execute `mind-wave-chat-continue` command (press Ctrl + u) to continue the conversation. 
 4. Execute `mind-wave-chat-generate-title` command (press Ctrl + i) to generate a new title based on the content.
+5. Execute the command `mind-wave-chat-ask-with-multiline` (press Ctrl + Shift + j), enter multiple questions and wait for ChatGPT to answer.
 
 If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT.
 
