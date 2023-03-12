@@ -276,9 +276,10 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defvar mind-wave-chat-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-j") #'mind-wave-chat-ask)
-    (define-key map (kbd "C-u") #'mind-wave-chat-continue)
-    (define-key map (kbd "C-i") #'mind-wave-chat-generate-title)
+    (define-key map (kbd "C-j")   #'mind-wave-chat-ask)
+    (define-key map (kbd "C-S-j") #'mind-wave-chat-ask-with-multiline)
+    (define-key map (kbd "C-u")   #'mind-wave-chat-continue)
+    (define-key map (kbd "C-i")   #'mind-wave-chat-generate-title)
     map)
   "Mind Wave Chat Keymap")
 
@@ -304,6 +305,54 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (message "Please don't send empty question.")
       (mind-wave-chat-ask-with-message prompt)
       )))
+
+(defun mind-wave-chat-ask-with-multiline ()
+  (interactive)
+  (let* ((bufname (buffer-name))
+         (edit-buffer (generate-new-buffer (format "mind-wave-edit-buffer-%s" bufname))))
+    (split-window-below -10)
+    (other-window 1)
+    (with-current-buffer edit-buffer
+      (mind-wave-edit-mode)
+      (set (make-local-variable 'mind-wave-edit-buffer-name) bufname))
+    (switch-to-buffer edit-buffer)
+    (mind-wave--edit-set-header-line)))
+
+(defun mind-wave--edit-set-header-line ()
+  "Set header line."
+  (setq header-line-format
+        (substitute-command-keys
+         (concat
+          "\\<eaf-edit-mode-map>"
+          " Mind-Wave Edit Mode: "
+          "Confirm with `\\[C-c C-c]', "
+          "Cancel with `\\[C-c C-k]'. "
+          ))))
+
+(defvar mind-wave-edit-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-k") #'mind-wave-edit-mode-cancel)
+    (define-key map (kbd "C-c C-c") #'mind-wave-edit-mode-confirm)
+    map))
+
+(defun mind-wave-edit-mode-cancel ()
+  (interactive)
+  (kill-buffer)
+  (delete-window)
+  (message "[Mind-Wave] Edit cancelled!"))
+
+(defun mind-wave-edit-mode-confirm ()
+  (interactive)
+  (let* ((bufname mind-wave-edit-buffer-name)
+         (prompt (buffer-substring-no-properties (point-min) (point-max))))
+    (kill-buffer)
+    (delete-window)
+
+    (switch-to-buffer bufname)
+    (mind-wave-chat-ask-with-message prompt)))
+
+(define-derived-mode mind-wave-edit-mode text-mode "mind-wave/edit"
+  "The major mode to edit focus text input.")
 
 (defun mind-wave-chat-continue ()
   (interactive)
