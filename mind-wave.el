@@ -170,9 +170,12 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defvar mind-wave-first-call-method nil)
 (defvar mind-wave-first-call-args nil)
 
+(defun mind-wave-decode-base64 (base64-string)
+  (decode-coding-string (base64-decode-string base64-string) 'utf-8))
+
 (defun mind-wave-call-async (method &rest args)
   "Call Python EPC function METHOD and ARGS asynchronously."
-  (if mind-wave-is-starting
+  (if (mind-wave-epc-live-p mind-wave-epc-process)
       (mind-wave-deferred-chain
         (mind-wave-epc-call-deferred mind-wave-epc-process (read method) args))
     (setq mind-wave-first-call-method method)
@@ -260,12 +263,12 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (when (and mind-wave-first-call-method
              mind-wave-first-call-args)
     (mind-wave-deferred-chain
-     (mind-wave-epc-call-deferred mind-wave-epc-process
-                                  (read mind-wave-first-call-method)
-                                  mind-wave-first-call-args)
-     (setq mind-wave-first-call-method nil)
-     (setq mind-wave-first-call-args nil)
-     )))
+      (mind-wave-epc-call-deferred mind-wave-epc-process
+                                   (read mind-wave-first-call-method)
+                                   mind-wave-first-call-args)
+      (setq mind-wave-first-call-method nil)
+      (setq mind-wave-first-call-args nil)
+      )))
 
 (defun mind-wave--encode-string (str)
   "Encode string STR with UTF-8 coding using Base64."
@@ -314,7 +317,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
        (insert "\n------ Assistant ------\n")
        (message "ChatGPT speaking..."))
       ("content"
-       (insert answer))
+       (insert (mind-wave-decode-base64 answer)))
       ("end"
        (insert "\n\n")
        (mind-wave-rename)
@@ -455,7 +458,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     ("content"
      (save-excursion
        (with-current-buffer (get-buffer-create buffername)
-         (insert answer))))
+         (insert (mind-wave-decode-base64 answer)))))
     ("end"
      (mind-wave--with-file-buffer filename
        (select-window (get-buffer-window buffer)))
@@ -534,7 +537,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     ("content"
      (save-excursion
        (with-current-buffer (get-buffer-create buffername)
-         (insert answer))))
+         (insert (mind-wave-decode-base64 answer)))))
     ("end"
      (select-window (get-buffer-window buffer-name))
      (message end-message)

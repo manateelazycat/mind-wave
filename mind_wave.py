@@ -26,7 +26,7 @@ import os
 import sys
 import base64
 from epc.server import ThreadingEPCServer
-from utils import (init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs)
+from utils import (init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
 
 class MindWave:
     def __init__(self, args):
@@ -151,7 +151,7 @@ class MindWave:
                 result_content = ""
             elif "content" in delta:
                 result_type = "content"
-                result_content = delta["content"]
+                result_content = string_to_base64(delta["content"])
 
             callback(result_type, result_content)
 

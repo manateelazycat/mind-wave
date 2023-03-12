@@ -222,3 +222,10 @@ def get_emacs_version():
 def get_os_name():
     return platform.system().lower()
 
+def string_to_base64(text):
+    import base64
+
+    base64_bytes = base64.b64encode(text.encode("utf-8"))
+    base64_string = base64_bytes.decode("utf-8")
+
+    return base64_string
