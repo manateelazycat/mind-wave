@@ -166,12 +166,18 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   "Get lang server with project path, file path or file extension."
   (expand-file-name user-emacs-directory))
 
+(defvar mind-wave-is-starting nil)
+(defvar mind-wave-first-call-method nil)
+(defvar mind-wave-first-call-args nil)
+
 (defun mind-wave-call-async (method &rest args)
   "Call Python EPC function METHOD and ARGS asynchronously."
-  (mind-wave-deferred-chain
-    (mind-wave-epc-call-deferred mind-wave-epc-process (read method) args)))
-
-(defvar mind-wave-is-starting nil)
+  (if mind-wave-is-starting
+      (mind-wave-deferred-chain
+        (mind-wave-epc-call-deferred mind-wave-epc-process (read method) args))
+    (setq mind-wave-first-call-method method)
+    (setq mind-wave-first-call-args args)
+    (mind-wave-start-process)))
 
 (defun mind-wave-restart-process ()
   "Stop and restart Mind-Wave process."
@@ -249,7 +255,17 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                                :connection (mind-wave-epc-connect "localhost" mind-wave-epc-port)
                                ))
   (mind-wave-epc-init-epc-layer mind-wave-epc-process)
-  (setq mind-wave-is-starting nil))
+  (setq mind-wave-is-starting nil)
+
+  (when (and mind-wave-first-call-method
+             mind-wave-first-call-args)
+    (mind-wave-deferred-chain
+     (mind-wave-epc-call-deferred mind-wave-epc-process
+                                  (read mind-wave-first-call-method)
+                                  mind-wave-first-call-args)
+     (setq mind-wave-first-call-method nil)
+     (setq mind-wave-first-call-args nil)
+     )))
 
 (defun mind-wave--encode-string (str)
   "Encode string STR with UTF-8 coding using Base64."
@@ -258,7 +274,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defvar mind-wave-chat-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-j" #'mind-wave-chat-ask)
-    (define-key map "\C-h" #'mind-wave-chat-continue)
+    (define-key map "\C-u" #'mind-wave-chat-continue)
     (define-key map "\C-i" #'mind-wave-chat-change-system)
     map)
   "Mind Wave Chat Keymap")
@@ -523,9 +539,6 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
      (select-window (get-buffer-window buffer-name))
      (message end-message)
      )))
-
-(unless mind-wave-is-starting
-  (mind-wave-start-process))
 
 (provide 'mind-wave)
 

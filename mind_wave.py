@@ -45,6 +45,11 @@ class MindWave:
         # self.server.logger.addHandler(ch)
         # self.server.logger = logger
 
+        # Get API key.
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            openai.api_key = api_key
+
         self.server.register_instance(self)  # register instance functions let elisp side call
 
         # Start EPC server with sub-thread, avoid block Qt main loop.
@@ -69,11 +74,6 @@ class MindWave:
 
         # Build subtitles dict.
         self.subtitle_dict = {}
-
-        # Get API key.
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            openai.api_key = api_key
 
         # event_loop never exit, simulation event loop.
         self.event_loop.join()
