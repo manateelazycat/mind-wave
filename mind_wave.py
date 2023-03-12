@@ -26,7 +26,17 @@ import os
 import sys
 import base64
 from epc.server import ThreadingEPCServer
+from functools import wraps
 from utils import (get_command_result, init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
+
+def threaded(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        thread = threading.Thread(target=func, args=args, kwargs=kwargs)
+        thread.start()
+        if hasattr(args[0], 'thread_queue'):
+            args[0].thread_queue.append(thread)
+    return wrapper
 
 class MindWave:
     def __init__(self, args):
@@ -118,11 +128,6 @@ class MindWave:
 
         return key
 
-    def chat_ask(self, buffer_file_name, buffer_content, prompt):
-        completion_thread = threading.Thread(target=lambda: self.do_chat_ask(buffer_file_name, buffer_content, prompt))
-        completion_thread.start()
-        self.thread_queue.append(completion_thread)
-
     def send_completion_request(self, messages):
         response = openai.ChatCompletion.create(
             model = "gpt-3.5-turbo",
@@ -155,7 +160,8 @@ class MindWave:
 
             callback(result_type, result_content)
 
-    def do_chat_ask(self, buffer_file_name, buffer_content, prompt):
+    @threaded
+    def chat_ask(self, buffer_file_name, buffer_content, prompt):
         content = self.chat_parse_content(buffer_content)
 
         messages = content + [{"role": "user", "content": prompt}]
@@ -195,12 +201,8 @@ class MindWave:
 
         return messages
 
+    @threaded
     def parse_title(self, buffer_file_name, text_content):
-        completion_thread = threading.Thread(target=lambda: self.do_parse_title(buffer_file_name, text_content))
-        completion_thread.start()
-        self.thread_queue.append(completion_thread)
-
-    def do_parse_title(self, buffer_file_name, text_content):
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
             [{"role": "system", "content": "你是一个语言学家"},
@@ -208,13 +210,8 @@ class MindWave:
 
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
 
+    @threaded
     def adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end):
-        completion_thread = threading.Thread(target=lambda: self.do_adjust_text(
-            buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end))
-        completion_thread.start()
-        self.thread_queue.append(completion_thread)
-
-    def do_adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end):
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
             [{"role": "system", "content": role},
@@ -240,13 +237,8 @@ class MindWave:
 
         self.send_stream_request(messages, callback)
 
+    @threaded
     def summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
-        completion_thread = threading.Thread(target=lambda: self.do_summary_video(
-            buffer_name, video_id, prompt, notify_start, notify_end))
-        completion_thread.start()
-        self.thread_queue.append(completion_thread)
-
-    def do_summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
         try:
             from youtube_transcript_api import YouTubeTranscriptApi
         except ImportError:
@@ -294,13 +286,8 @@ class MindWave:
 
         self.send_stream_request(messages, callback)
 
+    @threaded
     def summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
-        completion_thread = threading.Thread(target=lambda: self.do_summary_web(
-            buffer_name, url, prompt, notify_start, notify_end))
-        completion_thread.start()
-        self.thread_queue.append(completion_thread)
-
-    def do_summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
         import shutil
 
         if not shutil.which("readable"):
