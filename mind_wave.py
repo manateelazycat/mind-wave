@@ -241,6 +241,12 @@ class MindWave:
         self.send_stream_request(messages, callback)
 
     def summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
+        completion_thread = threading.Thread(target=lambda: self.do_summary_video(
+            buffer_name, video_id, prompt, notify_start, notify_end))
+        completion_thread.start()
+        self.thread_queue.append(completion_thread)
+
+    def do_summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
         try:
             from youtube_transcript_api import YouTubeTranscriptApi
         except ImportError:
@@ -289,6 +295,12 @@ class MindWave:
         self.send_stream_request(messages, callback)
 
     def summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
+        completion_thread = threading.Thread(target=lambda: self.do_summary_web(
+            buffer_name, url, prompt, notify_start, notify_end))
+        completion_thread.start()
+        self.thread_queue.append(completion_thread)
+
+    def do_summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
         import shutil
 
         if not shutil.which("readable"):
