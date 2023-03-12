@@ -505,6 +505,13 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
 
+(defvar mind-wave-summary-template "Your output should use the following template:
+### Summary
+### Facts
+- [Emoji] Bulletpoint
+
+Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in Chinse. Use the following text:")
+
 (defun mind-wave-summary-video ()
   (interactive)
   (let ((video-id (if eaf--buffer-url
@@ -514,22 +521,31 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (mind-wave-call-async "summary_video"
                           (buffer-name)
                           video-id
-                          "Your output should use the following template:
-### Summary
-### Facts
-- [Emoji] Bulletpoint
-
-Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in Chinse. Use the following text:"
+                          mind-wave-summary-template
                           "ChatGPT summary video..."
                           "ChatGPT summary video finish.")))
 
-(defun mind-wave-summary-video--response (buffer-name
-                                          buffername
-                                          mode
-                                          type
-                                          answer
-                                          start-message
-                                          end-message)
+(defun mind-wave-summary-web ()
+  (interactive)
+  (let ((url (if eaf--buffer-url
+                 eaf--buffer-url
+               (read-string "Web URL: "))))
+
+    (message "Parse web content...")
+    (mind-wave-call-async "summary_web"
+                          (buffer-name)
+                          url
+                          mind-wave-summary-template
+                          "ChatGPT summary web..."
+                          "ChatGPT summary web finish.")))
+
+(defun mind-wave-summary--response (buffer-name
+                                    buffername
+                                    mode
+                                    type
+                                    answer
+                                    start-message
+                                    end-message)
   (pcase type
     ("start"
      (select-window (get-buffer-window buffer-name))

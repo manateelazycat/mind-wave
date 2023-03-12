@@ -132,7 +132,7 @@ def get_emacs_func_result(method_name, *args):
     return result
 
 
-def get_command_result(command_string, cwd):
+def get_command_result(command_string, cwd=None):
     import subprocess
     
     process = subprocess.Popen(command_string, cwd=cwd, shell=True, text=True,
@@ -229,3 +229,4 @@ def string_to_base64(text):
     base64_string = base64_bytes.decode("utf-8")
 
     return base64_string
+

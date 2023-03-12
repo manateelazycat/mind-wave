@@ -26,7 +26,7 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 
 If you want to change the topic, create a new `*.chat` file and continue asking ChatGPT.
 
-### 文档模式
+### Document mode
 选中内容（请注意，不要选择太多，ChatGPT 的 API 有大小限制）
 
 1. 执行命令 `mind-wave-translate-to-english`，ChatGPT 获得翻译后会自动替换选中区域的内容。
@@ -39,7 +39,6 @@ Move the cursor to the desired function for refactoring.
 2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
 3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.
 
-### Video Mode
-Open a video website, such as [EAF](https://github.com/emacs-eaf/emacs-application-framework).
-
-1. Execute the command `mind-wave-summary-video`. ChatGPT will automatically obtain the video subtitles and analyze the video summary.
+### Summary Mode
+1. Open a video website and execute the command `mind-wave-summary-video`. ChatGPT will automatically retrieve the video subtitles and analyze the summary of the video (YouTube Transcript API installation is required).
+2. Open a text website and execute the command `mind-wave-summary-web`. ChatGPT will automatically retrieve the core content of the webpage and analyze the summary of the webpage (nodejs-readability-cli installation is required).

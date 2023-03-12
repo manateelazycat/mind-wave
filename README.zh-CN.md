@@ -40,6 +40,5 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 2. 执行命令 `mind-wave-explain-code`, ChatGPT 会自动分屏， 在屏幕右边显示代码的讲解
 
 ### 视频模式
-打开视频网站， 比如[EAF](https://github.com/emacs-eaf/emacs-application-framework)
-
-1. 执行命令 `mind-wave-summary-video`, ChatGPT 会自动获取视频字幕， 并分析视频概要
+1. 打开视频网站, 执行命令 `mind-wave-summary-video`, ChatGPT 会自动获取视频字幕， 并分析视频概要 (需要安装 `youtube_transcript_api`)
+2. 打开文本网站, 执行命令 `mind-wave-summary-web`, ChatGPT 会自动获取网页中的核心内容， 并分析网页概要 (需要安装 `nodejs-readability-cli`)

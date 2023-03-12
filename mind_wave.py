@@ -26,7 +26,7 @@ import os
 import sys
 import base64
 from epc.server import ThreadingEPCServer
-from utils import (init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
+from utils import (get_command_result, init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
 
 class MindWave:
     def __init__(self, args):
@@ -277,9 +277,33 @@ class MindWave:
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         def callback(result_type, result_content):
-            eval_in_emacs("mind-wave-summary-video--response",
+            eval_in_emacs("mind-wave-summary--response",
                           buffer_name,
-                          f"mind-wave-summary-video-{video_id}",
+                          f"mind-wave-summary-{video_id}",
+                          "text-mode",
+                          result_type,
+                          result_content,
+                          notify_start,
+                          notify_end)
+
+        self.send_stream_request(messages, callback)
+
+    def summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
+        import shutil
+
+        if not shutil.which("readable"):
+            message_emacs("Please install 'readable' cli tool first")
+            return
+
+        text = get_command_result(f"readable {url} -p 'text-content'")
+
+        messages = [{"role": "system", "content": "你是语文老师"},
+                    {"role": "user", "content": f"{prompt}： \n{text}"}]
+
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-summary--response",
+                          buffer_name,
+                          f"mind-wave-summary-{url}",
                           "text-mode",
                           result_type,
                           result_content,
