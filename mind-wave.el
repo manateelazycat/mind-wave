@@ -482,6 +482,50 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
 
+(defun mind-wave-summary-video ()
+  (interactive)
+  (let ((video-id (if eaf--buffer-url
+                      (cadr (string-split eaf--buffer-url "="))
+                    (read-string "YouTube Video ID: "))))
+
+    (mind-wave-call-async "summary_video"
+                          (buffer-name)
+                          video-id
+                          "Your output should use the following template:
+### Summary
+### Facts
+- [Emoji] Bulletpoint
+
+Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in Chinse. Use the following text:"
+                          "ChatGPT summary video..."
+                          "ChatGPT summary video finish.")))
+
+(defun mind-wave-summary-video--response (buffer-name
+                                          buffername
+                                          mode
+                                          type
+                                          answer
+                                          start-message
+                                          end-message)
+  (pcase type
+    ("start"
+     (select-window (get-buffer-window buffer-name))
+     (delete-other-windows)
+     (split-window-horizontally)
+     (other-window 1)
+     (get-buffer-create buffername)
+     (switch-to-buffer buffername)
+     (funcall (intern mode))
+     (message start-message))
+    ("content"
+     (save-excursion
+       (with-current-buffer (get-buffer-create buffername)
+         (insert answer))))
+    ("end"
+     (select-window (get-buffer-window buffer-name))
+     (message end-message)
+     )))
+
 (unless mind-wave-is-starting
   (mind-wave-start-process))
 

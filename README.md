@@ -36,3 +36,8 @@ Move the cursor to the desired function for refactoring.
 1. Execute the command `mind-wave-refactory-code`, ChatGPT will automatically split the screen to display the refactored code and suggestions for improvement on the right.
 2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
 3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.
+
+### Video Mode
+Open a video website, such as [EAF](https://github.com/emacs-eaf/emacs-application-framework).
+
+1. Execute the command `mind-wave-summary-video`. ChatGPT will automatically obtain the video subtitles and analyze the video summary.

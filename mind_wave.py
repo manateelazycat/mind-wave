@@ -66,6 +66,9 @@ class MindWave:
         # Build thread queue.
         self.thread_queue = []
 
+        # Build subtitles dict.
+        self.subtitle_dict = {}
+
         # event_loop never exit, simulation event loop.
         self.event_loop.join()
 
@@ -246,6 +249,61 @@ class MindWave:
                           notify_end)
 
         self.send_stream_request(messages, callback)
+
+    def summary_video(self, buffer_name, video_id, promt, notify_start, notify_end):
+        try:
+            from youtube_transcript_api import YouTubeTranscriptApi
+        except:
+            message_emacs("Please use pip3 install package 'youtube_transcript_api' first.")
+            return
+
+        message_emacs("Parse subtitles for video id: {}...".format(video_id))
+
+        # Use the OpenAI Edit endpoint to add punctuation, so that the Completion endpoint can summarize it properly
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            if video_id in self.subtitle_dict:
+                text = self.subtitle_dict[video_id]
+            else:
+                message_emacs("Get subtitle for video id: {}".format(video_id))
+
+                from youtube_transcript_api import YouTubeTranscriptApi
+                transcript = YouTubeTranscriptApi.get_transcript(video_id)
+
+                # Convert the transcript list object to plaintext so that we can use it with OpenAI
+                transcript_text = ""
+                for line in transcript:
+                    transcript_text += line["text"] + " "
+
+                message_emacs("Add punctuation to subtitle...")
+
+                import openai
+                openai.api_key = api_key
+                response = openai.Edit.create(
+                    model="text-davinci-edit-001",
+                    input=transcript_text,
+                    instruction="Add punctuation to the text.",
+                )
+                text = response["choices"][0]["text"]
+
+                self.subtitle_dict[video_id] = text
+
+                message_emacs("Finish punctuation to subtitle.")
+
+            messages = [{"role": "system", "content": "你是语文老师"},
+                        {"role": "user", "content": "{}： \n{}".format(promt, text)}]
+
+            def callback(result_type, result_content):
+                eval_in_emacs("mind-wave-summary-video--response",
+                              buffer_name,
+                              "mind-wave-summary-video-{}".format(video_id),
+                              "text-mode",
+                              result_type,
+                              result_content,
+                              notify_start,
+                              notify_end)
+
+            self.send_stream_request(messages, callback)
 
     def cleanup(self):
         """Do some cleanup before exit python process."""
