@@ -18,6 +18,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import openai
 import queue
 import threading
 import traceback
@@ -69,6 +70,11 @@ class MindWave:
         # Build subtitles dict.
         self.subtitle_dict = {}
 
+        # Get API key.
+        api_key = self.chat_get_api_key()
+        if api_key is not None:
+            openai.api_key = api_key
+
         # event_loop never exit, simulation event loop.
         self.event_loop.join()
 
@@ -112,59 +118,47 @@ class MindWave:
 
         return key
 
-    def chat_ask(self, buffer_file_name, buffer_content, promt):
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            completion_thread = threading.Thread(target=lambda: self.do_chat_ask(buffer_file_name, buffer_content, promt))
-            completion_thread.start()
-            self.thread_queue.append(completion_thread)
+    def chat_ask(self, buffer_file_name, buffer_content, prompt):
+        completion_thread = threading.Thread(target=lambda: self.do_chat_ask(buffer_file_name, buffer_content, prompt))
+        completion_thread.start()
+        self.thread_queue.append(completion_thread)
 
     def send_completion_request(self, messages):
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            import openai
-            openai.api_key = api_key
-            response = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo",
-                messages = messages)
+        response = openai.ChatCompletion.create(
+            model = "gpt-3.5-turbo",
+            messages = messages)
 
-            result = ''
-            for choice in response.choices:
-                result += choice.message.content
+        result = ''
+        for choice in response.choices:
+            result += choice.message.content
 
-            return (result, response)
-
-        return None
+        return (result, response)
 
     def send_stream_request(self, messages, callback):
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            import openai
-            openai.api_key = api_key
-            response = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo",
-                messages = messages,
-                temperature=0,
-                stream=True)
+        response = openai.ChatCompletion.create(
+            model = "gpt-3.5-turbo",
+            messages = messages,
+            temperature=0,
+            stream=True)
 
-            for chunk in response:
-                delta = chunk.choices[0].delta
-                if len(delta) == 0:
-                    result_type = "end"
-                    result_content = ""
-                elif "role" in delta:
-                    result_type = "start"
-                    result_content = ""
-                elif "content" in delta:
-                    result_type = "content"
-                    result_content = delta["content"]
+        for chunk in response:
+            delta = chunk.choices[0].delta
+            if len(delta) == 0:
+                result_type = "end"
+                result_content = ""
+            elif "role" in delta:
+                result_type = "start"
+                result_content = ""
+            elif "content" in delta:
+                result_type = "content"
+                result_content = delta["content"]
 
-                callback(result_type, result_content)
+            callback(result_type, result_content)
 
-    def do_chat_ask(self, buffer_file_name, buffer_content, promt):
+    def do_chat_ask(self, buffer_file_name, buffer_content, prompt):
         content = self.chat_parse_content(buffer_content)
 
-        messages = content + [{"role": "user", "content": promt}]
+        messages = content + [{"role": "user", "content": prompt}]
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result_type, result_content)
@@ -202,11 +196,9 @@ class MindWave:
         return messages
 
     def parse_title(self, buffer_file_name, text_content):
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            completion_thread = threading.Thread(target=lambda: self.do_parse_title(buffer_file_name, text_content))
-            completion_thread.start()
-            self.thread_queue.append(completion_thread)
+        completion_thread = threading.Thread(target=lambda: self.do_parse_title(buffer_file_name, text_content))
+        completion_thread.start()
+        self.thread_queue.append(completion_thread)
 
     def do_parse_title(self, buffer_file_name, text_content):
         text = base64.b64decode(text_content).decode("utf-8")
@@ -216,27 +208,25 @@ class MindWave:
 
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
 
-    def adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, promt, notify_end):
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            completion_thread = threading.Thread(target=lambda: self.do_adjust_text(
-                buffer_file_name, text_content, text_start, text_end, role, promt, notify_end))
-            completion_thread.start()
-            self.thread_queue.append(completion_thread)
+    def adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end):
+        completion_thread = threading.Thread(target=lambda: self.do_adjust_text(
+            buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end))
+        completion_thread.start()
+        self.thread_queue.append(completion_thread)
 
-    def do_adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, promt, notify_end):
+    def do_adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end):
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
             [{"role": "system", "content": role},
-             {"role": "user", "content": "{}：\n{}".format(promt, text)}])
+             {"role": "user", "content": "{}：\n{}".format(prompt, text)}])
 
         eval_in_emacs("mind-wave-adjust-text--response", buffer_file_name, result, text_start, text_end, notify_end)
 
-    def action_code(self, buffer_name, buffer_file_name, major_mode, code, promt, callback_template, notify_start, notify_end):
+    def action_code(self, buffer_name, buffer_file_name, major_mode, code, prompt, callback_template, notify_start, notify_end):
         text = base64.b64decode(code).decode("utf-8")
 
         messages = [{"role": "system", "content": "你是一个计算机教授"},
-                    {"role": "user", "content": "{}： \n{}".format(promt, text)}]
+                    {"role": "user", "content": "{}： \n{}".format(prompt, text)}]
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-split-window--response",
@@ -250,60 +240,53 @@ class MindWave:
 
         self.send_stream_request(messages, callback)
 
-    def summary_video(self, buffer_name, video_id, promt, notify_start, notify_end):
+    def summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
         try:
             from youtube_transcript_api import YouTubeTranscriptApi
-        except:
+        except ImportError:
             message_emacs("Please use pip3 install package 'youtube_transcript_api' first.")
             return
 
-        message_emacs("Parse subtitles for video id: {}...".format(video_id))
+        message_emacs(f"Parse subtitles for video id: {video_id}...")
 
         # Use the OpenAI Edit endpoint to add punctuation, so that the Completion endpoint can summarize it properly
-        api_key = self.chat_get_api_key()
-        if api_key is not None:
-            if video_id in self.subtitle_dict:
-                text = self.subtitle_dict[video_id]
-            else:
-                message_emacs("Get subtitle for video id: {}".format(video_id))
+        if video_id in self.subtitle_dict:
+            text = self.subtitle_dict[video_id]
+        else:
+            message_emacs(f"Get subtitle for video id: {video_id}")
 
-                from youtube_transcript_api import YouTubeTranscriptApi
-                transcript = YouTubeTranscriptApi.get_transcript(video_id)
+            transcript = YouTubeTranscriptApi.get_transcript(video_id)
 
-                # Convert the transcript list object to plaintext so that we can use it with OpenAI
-                transcript_text = ""
-                for line in transcript:
-                    transcript_text += line["text"] + " "
+            # Convert the transcript list object to plaintext so that we can use it with OpenAI
+            transcript_text = " ".join(line["text"] for line in transcript)
 
-                message_emacs("Add punctuation to subtitle...")
+            message_emacs("Add punctuation to subtitle...")
 
-                import openai
-                openai.api_key = api_key
-                response = openai.Edit.create(
-                    model="text-davinci-edit-001",
-                    input=transcript_text,
-                    instruction="Add punctuation to the text.",
-                )
-                text = response["choices"][0]["text"]
+            response = openai.Edit.create(
+                model="text-davinci-edit-001",
+                input=transcript_text,
+                instruction="Add punctuation to the text.",
+            )
+            text = response["choices"][0]["text"]
 
-                self.subtitle_dict[video_id] = text
+            self.subtitle_dict[video_id] = text
 
-                message_emacs("Finish punctuation to subtitle.")
+            message_emacs("Finish punctuation to subtitle.")
 
-            messages = [{"role": "system", "content": "你是语文老师"},
-                        {"role": "user", "content": "{}： \n{}".format(promt, text)}]
+        messages = [{"role": "system", "content": "你是语文老师"},
+                    {"role": "user", "content": f"{prompt}： \n{text}"}]
 
-            def callback(result_type, result_content):
-                eval_in_emacs("mind-wave-summary-video--response",
-                              buffer_name,
-                              "mind-wave-summary-video-{}".format(video_id),
-                              "text-mode",
-                              result_type,
-                              result_content,
-                              notify_start,
-                              notify_end)
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-summary-video--response",
+                          buffer_name,
+                          f"mind-wave-summary-video-{video_id}",
+                          "text-mode",
+                          result_type,
+                          result_content,
+                          notify_start,
+                          notify_end)
 
-            self.send_stream_request(messages, callback)
+        self.send_stream_request(messages, callback)
 
     def cleanup(self):
         """Do some cleanup before exit python process."""
