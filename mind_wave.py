@@ -271,20 +271,7 @@ class MindWave:
 
             message_emacs("Finish punctuation to subtitle.")
 
-        messages = [{"role": "system", "content": "你是语文老师"},
-                    {"role": "user", "content": f"{prompt}： \n{text}"}]
-
-        def callback(result_type, result_content):
-            eval_in_emacs("mind-wave-summary--response",
-                          buffer_name,
-                          f"mind-wave-summary-{video_id}",
-                          "text-mode",
-                          result_type,
-                          result_content,
-                          notify_start,
-                          notify_end)
-
-        self.send_stream_request(messages, callback)
+        self.summary_text(buffer_name, prompt, notify_start, notify_end, text, video_id)
 
     @threaded
     def summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
@@ -296,13 +283,16 @@ class MindWave:
 
         text = get_command_result(f"readable {url} -p 'text-content'")
 
+        self.summary_text(buffer_name, prompt, notify_start, notify_end, text, url)
+
+    def summary_text(self, buffer_name, prompt, notify_start, notify_end, text, template):
         messages = [{"role": "system", "content": "你是语文老师"},
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-summary--response",
                           buffer_name,
-                          f"mind-wave-summary-{url}",
+                          f"mind-wave-summary-{template}",
                           "text-mode",
                           result_type,
                           result_content,
