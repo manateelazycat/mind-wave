@@ -240,6 +240,21 @@ class MindWave:
 
         self.send_stream_request(messages, callback)
 
+    def get_video_subtitle(self, video_id):
+        from youtube_transcript_api import YouTubeTranscriptApi
+
+        message_emacs(f"Get subtitles for video id: {video_id}...")
+
+        if video_id in self.subtitle_dict:
+            text = self.subtitle_dict[video_id]
+        else:
+            transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["zh-Hans", "en"])
+            text = " ".join(line["text"] for line in transcript)
+
+            self.subtitle_dict[video_id] = text
+
+        return text
+
     @threaded
     def summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
         try:
@@ -248,44 +263,7 @@ class MindWave:
             message_emacs("Please use pip3 install package 'youtube_transcript_api' first.")
             return
 
-        message_emacs(f"Parse subtitles for video id: {video_id}...")
-
-        # Use the OpenAI Edit endpoint to add punctuation, so that the Completion endpoint can summarize it properly
-        if video_id in self.subtitle_dict:
-            text = self.subtitle_dict[video_id]
-        else:
-            message_emacs(f"Get subtitle for video id: {video_id}")
-
-            transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["zh-Hans", "en"])
-
-            # Convert the transcript list object to plaintext so that we can use it with OpenAI
-            transcript_text = " ".join(line["text"] for line in transcript)
-
-            message_emacs("Add punctuation to subtitle...")
-
-            try:
-                response = openai.Edit.create(
-                    model="text-davinci-edit-001",
-                    input=transcript_text,
-                    instruction="Add punctuation to the text.")
-            except:
-                import traceback
-                # Pick token number from OpenAI limit error.
-                token_number = int(traceback.format_exc().split("You request uses")[1].split("tokens")[0].strip())
-
-                # We pick 2800 tokens from subtitle, limit is 3000 tokens.
-                transcript_text = transcript_text[:int(len(transcript_text) * 2800.0 / token_number)]
-
-                response = openai.Edit.create(
-                    model="text-davinci-edit-001",
-                    input=transcript_text,
-                    instruction="Add punctuation to the text.")
-
-            text = response["choices"][0]["text"]
-
-            self.subtitle_dict[video_id] = text
-
-            message_emacs("Finish punctuation to subtitle.")
+        text = self.get_video_subtitle(video_id)
 
         self.summary_text(buffer_name, prompt, notify_start, notify_end, text, video_id)
 
@@ -302,8 +280,10 @@ class MindWave:
         self.summary_text(buffer_name, prompt, notify_start, notify_end, text, url)
 
     def summary_text(self, buffer_name, prompt, notify_start, notify_end, text, template):
-        messages = [{"role": "system", "content": "你是语文老师"},
-                    {"role": "user", "content": f"{prompt}： \n{text}"}]
+        part_size = 3000
+        message_parts = []
+        for i in range(0, len(text), part_size):
+            message_parts.append(text[i:i + part_size])
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-summary--response",
@@ -315,7 +295,37 @@ class MindWave:
                           notify_start,
                           notify_end)
 
-        self.send_stream_request(messages, callback)
+        self.send_stream_part_request(prompt, message_parts, callback)
+
+    def send_stream_part_request(self, prompt, message_parts, callback):
+        if len(message_parts) > 0:
+            text = message_parts[0]
+            messages = [{"role": "system", "content": "你是语文老师"},
+                        {"role": "user", "content": f"{prompt}： \n{text}"}]
+
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                temperature=0,
+                stream=True)
+
+            for chunk in response:
+                delta = chunk.choices[0].delta
+                if len(delta) == 0:
+                    result_type = "end"
+                    result_content = ""
+                elif "role" in delta:
+                    result_type = "start"
+                    result_content = ""
+                elif "content" in delta:
+                    result_type = "content"
+                    result_content = string_to_base64(delta["content"])
+
+                callback(result_type, result_content)
+
+                if result_type == "end":
+                    self.send_stream_part_request(prompt, message_parts[1:], callback)
+
 
     def cleanup(self):
         """Do some cleanup before exit python process."""

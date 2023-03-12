@@ -623,9 +623,14 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     ("content"
      (save-excursion
        (with-current-buffer (get-buffer-create buffername)
+         (goto-char (point-max))
          (insert (mind-wave-decode-base64 answer)))))
     ("end"
      (select-window (get-buffer-window buffer-name))
+     (save-excursion
+       (with-current-buffer (get-buffer-create buffername)
+         (goto-char (point-max))
+         (insert "\n\n")))
      (message end-message)
      )))
 
