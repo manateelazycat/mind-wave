@@ -33,10 +33,10 @@ There are two ways of inputting multi-line content:
 2. Execute the command `mind-wave-chat-ask-insert-line` to insert the `----- User ------` separator, continue inputting multiple lines in the buffer, and finally execute `mind-wave-chat-ask-send-buffer`.
 
 ### Document mode
-选中内容（请注意，不要选择太多，ChatGPT 的 API 有大小限制）
+Selected Content:
 
-1. 执行命令 `mind-wave-translate-to-english`，ChatGPT 获得翻译后会自动替换选中区域的内容。
-1. 执行命令 `mind-wave-proofreading-doc`，ChatGPT 会用润色后的文档自动替换选中区域的内容。
+1. Execute the command `mind-wave-translate-to-english`, ChatGPT will automatically replace the selected area with the translated content.
+2. Execute the command `mind-wave-proofreading-doc`, ChatGPT will automatically replace the selected area with the polished document. 
 
 ### Code Refactoring Mode
 Move the cursor to the desired function for refactoring.

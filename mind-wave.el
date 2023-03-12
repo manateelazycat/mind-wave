@@ -443,8 +443,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (mind-wave--encode-string translate-text)
                           translate-start
                           translate-end
-                          "You are an English translator"
-                          "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. If the input content is Markdown syntax, output use Markdown syntax too. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is"
+                          "You are an English Translator"
+                          "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax"
                           "Translate done"
                           )))
 
