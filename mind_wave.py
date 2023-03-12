@@ -209,7 +209,7 @@ class MindWave:
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
             [{"role": "system", "content": "你是一个语言学家"},
-             {"role": "user", "content": f"给下面这段话起一个标题：\n{text}"}])
+             {"role": "user", "content": f"给下面这段话起一个标题, 标题不要带引号：\n{text}"}])
 
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
 
