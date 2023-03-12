@@ -416,6 +416,14 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
     (buffer-substring-no-properties code-start code-end)))
 
+(defun mind-wave-show-chat-window (buffername mode)
+  (delete-other-windows)
+  (split-window-horizontally)
+  (other-window 1)
+  (get-buffer-create buffername)
+  (switch-to-buffer buffername)
+  (funcall (intern mode)))
+
 (defun mind-wave-split-window--response (filename
                                          buffername
                                          mode
@@ -426,12 +434,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (pcase type
     ("start"
      (mind-wave--with-file-buffer filename
-       (delete-other-windows)
-       (split-window-horizontally)
-       (other-window 1)
-       (get-buffer-create buffername)
-       (switch-to-buffer buffername)
-       (funcall (intern mode))
+       (mind-wave-show-chat-window buffername mode)
        (message start-message)))
     ("content"
      (save-excursion
@@ -510,12 +513,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
   (pcase type
     ("start"
      (select-window (get-buffer-window buffer-name))
-     (delete-other-windows)
-     (split-window-horizontally)
-     (other-window 1)
-     (get-buffer-create buffername)
-     (switch-to-buffer buffername)
-     (funcall (intern mode))
+     (mind-wave-show-chat-window buffername mode)
      (message start-message))
     ("content"
      (save-excursion
