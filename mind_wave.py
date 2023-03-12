@@ -114,7 +114,7 @@ class MindWave:
             key = os.environ.get("OPENAI_API_KEY")
 
         if key is None:
-                message_emacs("ChatGPT API key not found, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {}. Or set the enviroment OPENAI_API_KEY".format(mind_wave_chat_api_key_file_path))
+                message_emacs(f"ChatGPT API key not found, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {mind_wave_chat_api_key_file_path}. Or set the enviroment OPENAI_API_KEY")
 
         return key
 
@@ -204,7 +204,7 @@ class MindWave:
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
             [{"role": "system", "content": "你是一个语言学家"},
-             {"role": "user", "content": "{}：\n{}".format("给下面这段话起一个标题", text)}])
+             {"role": "user", "content": f"给下面这段话起一个标题：\n{text}"}])
 
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
 
@@ -218,7 +218,7 @@ class MindWave:
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
             [{"role": "system", "content": role},
-             {"role": "user", "content": "{}：\n{}".format(prompt, text)}])
+             {"role": "user", "content": f"{prompt}：\n{text}"}])
 
         eval_in_emacs("mind-wave-adjust-text--response", buffer_file_name, result, text_start, text_end, notify_end)
 
@@ -226,12 +226,12 @@ class MindWave:
         text = base64.b64decode(code).decode("utf-8")
 
         messages = [{"role": "system", "content": "你是一个计算机教授"},
-                    {"role": "user", "content": "{}： \n{}".format(prompt, text)}]
+                    {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-split-window--response",
                           buffer_file_name,
-                          "mind-wave-{}-{}".format(callback_template, buffer_name),
+                          f"mind-wave-{callback_template}-{buffer_name}",
                           major_mode,
                           result_type,
                           result_content,
