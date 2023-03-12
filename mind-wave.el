@@ -276,9 +276,9 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defvar mind-wave-chat-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-j" #'mind-wave-chat-ask)
-    (define-key map "\C-u" #'mind-wave-chat-continue)
-    (define-key map "\C-i" #'mind-wave-chat-change-system)
+    (define-key map (kbd "C-j") #'mind-wave-chat-ask)
+    (define-key map (kbd "C-u") #'mind-wave-chat-continue)
+    (define-key map (kbd "C-i") #'mind-wave-chat-generate-title)
     map)
   "Mind Wave Chat Keymap")
 
@@ -320,17 +320,22 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
        (insert (mind-wave-decode-base64 answer)))
       ("end"
        (insert "\n\n")
-       (mind-wave-rename)
+       (mind-wave-chat-parse-title nil)
        (message "ChatGPT response finish.")
        ))))
 
-(defun mind-wave-rename ()
-  (let ((buffername (buffer-name)))
-    (unless (and (string-prefix-p "#" buffername)
-                 (string-suffix-p "#.chat" buffername))
-      (mind-wave-call-async "parse_title"
-                            (buffer-file-name)
-                            (mind-wave--encode-string (buffer-string))))))
+(defun mind-wave-chat-generate-title ()
+  (interactive)
+  (mind-wave-chat-parse-title t))
+
+(defun mind-wave-chat-parse-title (force)
+  (interactive)
+  (when (or (not (and (string-prefix-p "#" (buffer-name))
+                      (string-suffix-p "#.chat" (buffer-name))))
+            force)
+    (mind-wave-call-async "parse_title"
+                          (buffer-file-name)
+                          (mind-wave--encode-string (buffer-string)))))
 
 (defun mind-wave-parse-title--response (filename title)
   (mind-wave--with-file-buffer
@@ -338,10 +343,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (set-visited-file-name (format "#%s#.chat" title))
     (delete-file filename)
     (save-buffer)))
-
-(defun mind-wave-chat-change-system ()
-  (interactive)
-  (message "*******"))
 
 (define-minor-mode mind-wave-chat-mode
   "Mind Wave mode."
