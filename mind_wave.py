@@ -253,18 +253,31 @@ class MindWave:
         else:
             message_emacs(f"Get subtitle for video id: {video_id}")
 
-            transcript = YouTubeTranscriptApi.get_transcript(video_id)
+            transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["zh-Hans", "en"])
 
             # Convert the transcript list object to plaintext so that we can use it with OpenAI
             transcript_text = " ".join(line["text"] for line in transcript)
 
             message_emacs("Add punctuation to subtitle...")
 
-            response = openai.Edit.create(
-                model="text-davinci-edit-001",
-                input=transcript_text,
-                instruction="Add punctuation to the text.",
-            )
+            try:
+                response = openai.Edit.create(
+                    model="text-davinci-edit-001",
+                    input=transcript_text,
+                    instruction="Add punctuation to the text.")
+            except:
+                import traceback
+                # Pick token number from OpenAI limit error.
+                token_number = int(traceback.format_exc().split("You request uses")[1].split("tokens")[0].strip())
+
+                # We pick 2800 tokens from subtitle, limit is 3000 tokens.
+                transcript_text = transcript_text[:int(len(transcript_text) * 2800.0 / token_number)]
+
+                response = openai.Edit.create(
+                    model="text-davinci-edit-001",
+                    input=transcript_text,
+                    instruction="Add punctuation to the text.")
+
             text = response["choices"][0]["text"]
 
             self.subtitle_dict[video_id] = text
