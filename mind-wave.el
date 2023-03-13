@@ -528,6 +528,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     ("content"
      (save-excursion
        (with-current-buffer (get-buffer-create buffername)
+         (goto-char (point-max))
          (insert (mind-wave-decode-base64 answer)))))
     ("end"
      (mind-wave--with-file-buffer filename
