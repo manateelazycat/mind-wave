@@ -48,13 +48,6 @@ class MindWave:
         # self.server.logger.setLevel(logging.DEBUG)
         self.server.allow_reuse_address = True
 
-        # ch = logging.FileHandler(filename=os.path.join(mind-wave_config_dir, 'epc_log.txt'), mode='w')
-        # formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s')
-        # ch.setFormatter(formatter)
-        # ch.setLevel(logging.DEBUG)
-        # self.server.logger.addHandler(ch)
-        # self.server.logger = logger
-
         # Get API key.
         api_key = self.chat_get_api_key()
         if api_key is not None:
@@ -74,11 +67,6 @@ class MindWave:
         self.event_loop = threading.Thread(target=self.event_dispatcher)
         self.event_loop.start()
 
-        # All LSP server response running in message_thread.
-        self.message_queue = queue.Queue()
-        self.message_thread = threading.Thread(target=self.message_dispatcher)
-        self.message_thread.start()
-
         # Build thread queue.
         self.thread_queue = []
 
@@ -91,22 +79,8 @@ class MindWave:
     def event_dispatcher(self):
         try:
             while True:
-                message = self.event_queue.get(True)
-
-                print(message)
-
+                self.event_queue.get(True)
                 self.event_queue.task_done()
-        except:
-            logger.error(traceback.format_exc())
-
-    def message_dispatcher(self):
-        try:
-            while True:
-                message = self.message_queue.get(True)
-
-                print(message)
-
-                self.message_queue.task_done()
         except:
             logger.error(traceback.format_exc())
 
@@ -124,7 +98,7 @@ class MindWave:
             key = os.environ.get("OPENAI_API_KEY")
 
         if key is None:
-                message_emacs(f"ChatGPT API key not found, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {mind_wave_chat_api_key_file_path}. Or set the enviroment OPENAI_API_KEY")
+            message_emacs(f"ChatGPT API key not found, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {mind_wave_chat_api_key_file_path}. Or set the enviroment OPENAI_API_KEY")
 
         return key
 
@@ -147,17 +121,7 @@ class MindWave:
             stream=True)
 
         for chunk in response:
-            delta = chunk.choices[0].delta
-            if len(delta) == 0:
-                result_type = "end"
-                result_content = ""
-            elif "role" in delta:
-                result_type = "start"
-                result_content = ""
-            elif "content" in delta:
-                result_type = "content"
-                result_content = string_to_base64(delta["content"])
-
+            (result_type, result_content) = self.get_chunk_result(chunk)
             callback(result_type, result_content)
 
     @threaded
@@ -281,9 +245,7 @@ class MindWave:
 
     def summary_text(self, buffer_name, prompt, notify_start, notify_end, text, template):
         part_size = 3000
-        message_parts = []
-        for i in range(0, len(text), part_size):
-            message_parts.append(text[i:i + part_size])
+        message_parts = [text[i:i + part_size] for i in range(0, len(text), part_size)]
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-summary--response",
@@ -298,34 +260,34 @@ class MindWave:
         self.send_stream_part_request(prompt, message_parts, callback)
 
     def send_stream_part_request(self, prompt, message_parts, callback):
-        if len(message_parts) > 0:
-            text = message_parts[0]
-            messages = [{"role": "system", "content": "你是语文老师"},
-                        {"role": "user", "content": f"{prompt}： \n{text}"}]
+        if not message_parts:
+            return
 
-            response = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo",
-                messages = messages,
-                temperature=0,
-                stream=True)
+        text = message_parts[0]
+        messages = [{"role": "system", "content": "你是语文老师"},
+                    {"role": "user", "content": f"{prompt}： \n{text}"}]
 
-            for chunk in response:
-                delta = chunk.choices[0].delta
-                if len(delta) == 0:
-                    result_type = "end"
-                    result_content = ""
-                elif "role" in delta:
-                    result_type = "start"
-                    result_content = ""
-                elif "content" in delta:
-                    result_type = "content"
-                    result_content = string_to_base64(delta["content"])
+        response = openai.ChatCompletion.create(
+            model = "gpt-3.5-turbo",
+            messages = messages,
+            temperature=0,
+            stream=True)
 
-                callback(result_type, result_content)
+        for chunk in response:
+            (result_type, result_content) = self.get_chunk_result(chunk)
+            callback(result_type, result_content)
 
-                if result_type == "end":
-                    self.send_stream_part_request(prompt, message_parts[1:], callback)
+            if result_type == "end":
+                self.send_stream_part_request(prompt, message_parts[1:], callback)
 
+    def get_chunk_result(self, chunk):
+        delta = chunk.choices[0].delta
+        if not delta:
+            return ("end", "")
+        elif "role" in delta:
+            return ("start", "")
+        elif "content" in delta:
+            return ("content", string_to_base64(delta["content"]))
 
     def cleanup(self):
         """Do some cleanup before exit python process."""
