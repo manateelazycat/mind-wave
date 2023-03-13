@@ -221,9 +221,8 @@ class MindWave:
 
     @threaded
     def summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
-        try:
-            from youtube_transcript_api import YouTubeTranscriptApi
-        except ImportError:
+        import importlib
+        if importlib.find_loader("youtube_transcript_api") is None:
             message_emacs("Please use pip3 install package 'youtube_transcript_api' first.")
             return
 
