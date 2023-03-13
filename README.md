@@ -48,3 +48,14 @@ Move the cursor to the desired function for refactoring.
 ### Summary Mode
 1. Open a video website and execute the command `mind-wave-summary-video`. ChatGPT will automatically retrieve the video subtitles and analyze the summary of the video (YouTube Transcript API installation is required).
 2. Open a text website and execute the command `mind-wave-summary-web`. ChatGPT will automatically retrieve the core content of the webpage and analyze the summary of the webpage (nodejs-readability-cli installation is required).
+
+## Feedback Issues
+
+Please use the command `emacs -q` and only add the mind-wave configuration for comparison testing. If `emacs -q` can work properly, please check your personal configuration file.
+
+If the problem still exists in the `emacs -q` environment, please [submit an issue](https://github.com/manateelazycat/mind-wave/issues/new) and attach the contents of the `*mind-wave*` window to help us troubleshoot. There are many clues there that can help us investigate the problem.
+
+* If you encounter a crash, please collect the crash information using the following steps:
+  1. Install gdb and enable the option `(setq mind-wave-enable-debug t)`
+  2. Use the command `mind-wave-restart-process` to restart the MIND-WAVE process.
+  3. Send the contents of `*mind-wave*` window when the next crash occurs.

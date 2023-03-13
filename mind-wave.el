@@ -154,10 +154,6 @@
 Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffer content when next crash."
   :type 'boolean)
 
-(defcustom mind-wave-enable-log nil
-  "Enable this option to print log message in `*mind-wave*' buffer, default only print message header."
-  :type 'boolean)
-
 (defcustom mind-wave-enable-profile nil
   "Enable this option to output performance data to ~/mind-wave.prof."
   :type 'boolean)
