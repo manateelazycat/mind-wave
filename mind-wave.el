@@ -82,6 +82,11 @@
   "Mind-Wave group."
   :group 'applications)
 
+(defcustom mind-wave-auto-change-title t
+  "Whether to automatically change the title according to the content."
+  :type 'boolean
+  :group 'mind-wave)
+
 (defvar mind-wave-server nil
   "The Mind-Wave Server.")
 
@@ -385,7 +390,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
        (insert (mind-wave-decode-base64 answer)))
       ("end"
        (insert "\n\n")
-       (mind-wave-chat-parse-title nil)
+       (when mind-wave-auto-change-title
+         (mind-wave-chat-parse-title nil))
        (message "ChatGPT response finish.")
        ))))
 
