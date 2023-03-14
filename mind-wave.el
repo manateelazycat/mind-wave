@@ -372,7 +372,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-continue ()
   (interactive)
-  (mind-wave-chat-ask-with-message "继续 (如果你的输出包含代码内容， 请用 Markdown 的格式来输出）"))
+  (mind-wave-chat-ask-with-message "继续"))
 
 (defun mind-wave-chat-ask--response (filename type answer)
   (mind-wave--with-file-buffer filename
