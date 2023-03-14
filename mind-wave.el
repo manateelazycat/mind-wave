@@ -413,7 +413,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (mind-wave--with-file-buffer
       filename
     (message "Generate title done.")
-    (set-visited-file-name (format "#%s#.chat" (string-replace "/" "" title)))
+    (set-visited-file-name (format "#%s#.chat" (string-replace "/" "_" title)))
     (delete-file filename)
     (save-buffer)))
 
