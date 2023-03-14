@@ -398,6 +398,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (when (or (not (and (string-prefix-p "#" (buffer-name))
                       (string-suffix-p "#.chat" (buffer-name))))
             force)
+    (message "Generate title from chat content...")
     (mind-wave-call-async "parse_title"
                           (buffer-file-name)
                           (mind-wave--encode-string (mind-wave-get-buffer-string)))))
@@ -405,7 +406,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-parse-title--response (filename title)
   (mind-wave--with-file-buffer
       filename
-    (set-visited-file-name (format "#%s#.chat" title))
+    (message "Generate title done.")
+    (set-visited-file-name (format "#%s#.chat" (string-replace "/" "" title)))
     (delete-file filename)
     (save-buffer)))
 
