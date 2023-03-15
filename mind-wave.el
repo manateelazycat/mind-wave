@@ -87,6 +87,11 @@
   :type 'boolean
   :group 'mind-wave)
 
+(defcustom mind-wave-api-key-path (expand-file-name (file-name-concat user-emacs-directory "mind-wave" "chatgpt_api_key.txt"))
+  "The path to store OpenAI API Key."
+  :type 'boolean
+  :group 'mind-wave)
+
 (defvar mind-wave-server nil
   "The Mind-Wave Server.")
 

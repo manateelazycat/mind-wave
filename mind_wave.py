@@ -27,7 +27,7 @@ import sys
 import base64
 from epc.server import ThreadingEPCServer
 from functools import wraps
-from utils import (get_command_result, init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
+from utils import (get_command_result, get_emacs_var, init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
 
 def threaded(func):
     @wraps(func)
@@ -85,9 +85,7 @@ class MindWave:
             logger.error(traceback.format_exc())
 
     def chat_get_api_key(self):
-        user_emacs_dir = get_emacs_func_result("get-user-emacs-directory")
-        mind_wave_dir = os.path.join(user_emacs_dir, "mind-wave")
-        mind_wave_chat_api_key_file_path = os.path.join(mind_wave_dir, "chatgpt_api_key.txt")
+        mind_wave_chat_api_key_file_path = get_emacs_var("mind-wave-api-key-path")
         key = None
         if os.path.exists(mind_wave_chat_api_key_file_path):
             with open(mind_wave_chat_api_key_file_path, "r") as f:
