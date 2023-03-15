@@ -319,7 +319,11 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-ask-insert-line ()
   (interactive)
-  (insert "\n------ User ------\n")
+  (insert (concat
+           (if (equal (point) (point-min))
+               ""
+             "\n")
+           "------ User ------\n"))
   (message "[Mind-Wave] Continue input, do `mind-wave-chat-ask-send-buffer` when finish input."))
 
 (defun mind-wave-chat-ask-send-buffer ()
