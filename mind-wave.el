@@ -328,6 +328,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-ask-send-buffer ()
   (interactive)
+  (goto-char (line-end-position))
   (insert "\n")
   (message "Wait ChatGPT...")
   (mind-wave-call-async "chat_ask"
