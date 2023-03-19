@@ -389,22 +389,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (interactive)
   (mind-wave-chat-ask-with-message "继续"))
 
-(defun mind-wave-chat-ask--response (filename type answer)
-  (mind-wave--with-file-buffer filename
-    (goto-char (point-max))
-    (pcase type
-      ("start"
-       (insert "\n------ Assistant ------\n")
-       (message "ChatGPT speaking..."))
-      ("content"
-       (insert (mind-wave-decode-base64 answer)))
-      ("end"
-       (insert "\n\n")
-       (when mind-wave-auto-change-title
-         (mind-wave-chat-parse-title nil))
-       (message "ChatGPT response finish.")
-       ))))
-
 (defun mind-wave-chat-generate-title ()
   (interactive)
   (mind-wave-chat-parse-title t))
@@ -527,29 +511,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (switch-to-buffer buffername)
   (funcall (intern mode)))
 
-(defun mind-wave-split-window--response (filename
-                                         buffername
-                                         mode
-                                         type
-                                         answer
-                                         start-message
-                                         end-message)
-  (pcase type
-    ("start"
-     (mind-wave--with-file-buffer filename
-       (mind-wave-show-chat-window buffername mode)
-       (message start-message)))
-    ("content"
-     (save-excursion
-       (with-current-buffer (get-buffer-create buffername)
-         (goto-char (point-max))
-         (insert (mind-wave-decode-base64 answer)))))
-    ("end"
-     (mind-wave--with-file-buffer filename
-       (select-window (get-buffer-window buffer)))
-     (message end-message)
-     )))
-
 (defun mind-wave-refactory-code ()
   (interactive)
   (message "Refactoring...")
@@ -623,16 +584,32 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
                           "ChatGPT summary web..."
                           "ChatGPT summary web finish.")))
 
-(defun mind-wave-summary--response (buffer-name
-                                    buffername
-                                    mode
-                                    type
-                                    answer
-                                    start-message
-                                    end-message)
+(defun mind-wave-chat-ask--response (filename type answer)
+  (mind-wave--with-file-buffer filename
+    (goto-char (point-max))
+    (pcase type
+      ("start"
+       (insert "\n------ Assistant ------\n")
+       (message "ChatGPT speaking..."))
+      ("content"
+       (insert (mind-wave-decode-base64 answer)))
+      ("end"
+       (insert "\n\n")
+       (when mind-wave-auto-change-title
+         (mind-wave-chat-parse-title nil))
+       (message "ChatGPT response finish.")
+       ))))
+
+(defun mind-wave-split-window--response (buffer
+                                         buffername
+                                         mode
+                                         type
+                                         answer
+                                         start-message
+                                         end-message)
   (pcase type
     ("start"
-     (select-window (get-buffer-window buffer-name))
+     (select-window (get-buffer-window buffer))
      (mind-wave-show-chat-window buffername mode)
      (message start-message))
     ("content"
@@ -641,7 +618,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
          (goto-char (point-max))
          (insert (mind-wave-decode-base64 answer)))))
     ("end"
-     (select-window (get-buffer-window buffer-name))
+     (select-window (get-buffer-window buffer))
      (save-excursion
        (with-current-buffer (get-buffer-create buffername)
          (goto-char (point-max))

@@ -27,7 +27,7 @@ import sys
 import base64
 from epc.server import ThreadingEPCServer
 from functools import wraps
-from utils import (get_command_result, get_emacs_var, init_epc_client, eval_in_emacs, logger, close_epc_client, get_emacs_func_result, message_emacs, string_to_base64)
+from utils import (get_command_result, get_emacs_var, init_epc_client, eval_in_emacs, logger, close_epc_client, message_emacs, string_to_base64)
 
 def threaded(func):
     @wraps(func)
@@ -192,7 +192,7 @@ class MindWave:
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-split-window--response",
-                          buffer_file_name,
+                          buffer_name,
                           f"mind-wave-{callback_template}-{buffer_name}",
                           major_mode,
                           result_type,
@@ -245,7 +245,7 @@ class MindWave:
         message_parts = [text[i:i + part_size] for i in range(0, len(text), part_size)]
 
         def callback(result_type, result_content):
-            eval_in_emacs("mind-wave-summary--response",
+            eval_in_emacs("mind-wave-split-window--response",
                           buffer_name,
                           f"mind-wave-summary-{template}",
                           "text-mode",
