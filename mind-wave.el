@@ -519,7 +519,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "请帮我重构一下下面这段代码"
+                        "请帮我重构一下下面这段代码, 如果重构后代码没有变化， 你就说 '不需要重构' "
                         "refactory"
                         "ChatGPT refactoring..."
                         "ChatGPT refactory finish."))
