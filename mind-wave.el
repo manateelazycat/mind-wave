@@ -411,21 +411,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-file filename)
     (save-buffer)))
 
-(define-minor-mode mind-wave-chat-mode
-  "Mind Wave mode."
-  :keymap mind-wave-chat-mode-map
-  :init-value nil
-  (if mind-wave-chat-mode
-      (mind-wave-chat-mode-enable)
-    (mind-wave-chat-mode-disable)))
-
-(defun mind-wave-chat-mode-enable ()
-  "Enable Mind Wave mode."
-  (message "Mind Wave mode enable"))
-
-(defun mind-wave-chat-mode-disable ()
-  "Disable Mind Wave mode."
-  (message "Mind Wave mode disable"))
+(define-derived-mode mind-wave-chat-mode gfm-view-mode "Mind-Wave"
+  (read-only-mode -1))
 
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
