@@ -93,7 +93,7 @@
   :type 'boolean
   :group 'mind-wave)
 
-(defvar mind-wave-lang (car (string-split (getenv "LANG") "\\.")))
+(defvar mind-wave-lang (car (split-string (getenv "LANG") "\\.")))
 
 (defvar mind-wave-server nil
   "The Mind-Wave Server.")
