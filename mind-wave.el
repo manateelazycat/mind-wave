@@ -1,7 +1,7 @@
-;;; mind-wave.el --- LSP bridge  -*- lexical-binding: t -*-
+;;; mind-wave.el --- Mind Wave  -*- lexical-binding: t -*-
 
 ;; Filename: mind-wave.el
-;; Description: LSP bridge
+;; Description: Mind Wave
 ;; Author: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2023, Andy Stewart, all rights reserved.
