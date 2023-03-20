@@ -93,6 +93,8 @@
   :type 'boolean
   :group 'mind-wave)
 
+(defvar mind-wave-lang (car (string-split (getenv "LANG") "\\.")))
+
 (defvar mind-wave-server nil
   "The Mind-Wave Server.")
 
@@ -409,7 +411,11 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (message "Generate title from chat content...")
     (mind-wave-call-async "parse_title"
                           (buffer-file-name)
-                          (mind-wave--encode-string (mind-wave-get-buffer-string)))))
+                          (mind-wave--encode-string (mind-wave-get-buffer-string))
+                          (if (string-equal mind-wave-lang "zh_CN")
+                              "给下面这段话起一个标题, 标题不要带引号"
+                            "Give the following passage a title without quotation marks")
+                          )))
 
 (defun mind-wave-parse-title--response (filename title)
   (mind-wave--with-file-buffer
@@ -448,8 +454,10 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (mind-wave--encode-string translate-text)
                           translate-start
                           translate-end
-                          "你是一个高水平的作家"
-                          "请帮我润色一下下面这段话"
+                          "You are a high level writer."
+                          (if (string-equal mind-wave-lang "zh_CN")
+                              "请帮我润色一下下面这段话"
+                            "Please help me polish the following passage")
                           "Proofread done"
                           )))
 
@@ -509,7 +517,9 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "请帮我重构一下下面这段代码, 如果重构后代码没有变化， 你就说 '不需要重构' "
+                        (if (string-equal mind-wave-lang "zh_CN")
+                            "请帮我重构一下下面这段代码, 如果重构后代码没有变化， 你就说 '不需要重构' "
+                          "Please help me refactor the following code, if the code does not change after refactoring, you say 'no need to refactor'")
                         "refactory"
                         "ChatGPT refactoring..."
                         "ChatGPT refactory finish."))
@@ -522,7 +532,9 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码"
+                        (if (string-equal mind-wave-lang "zh_CN")
+                            "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码"
+                          "Please add code comments to the following code, require comments to be written in English in the code, and output the code including comments")
                         "comment"
                         "ChatGPT commenting..."
                         "ChatGPT comment finish."))
@@ -535,17 +547,20 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "请详细解释一下下面这段代码的意思"
+                        (if (string-equal mind-wave-lang "zh_CN")
+                            "请详细解释一下下面这段代码的意思"
+                          "Please explain in detail the meaning of the following code")
                         "explain"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
 
-(defvar mind-wave-summary-template "Your output should use the following template:
+(defvar mind-wave-summary-template (format "Your output should use the following template:
 ### Summary
 ### Facts
 - [Emoji] Bulletpoint
 
-Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in Chinse. Use the following text:")
+Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in %s. Use the following text:"
+                                           (if (string-equal mind-wave-lang "zh_CN") "Chinese" "English")))
 
 (defun mind-wave-summary-video ()
   (interactive)

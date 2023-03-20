@@ -167,11 +167,11 @@ class MindWave:
         return messages
 
     @threaded
-    def parse_title(self, buffer_file_name, text_content):
+    def parse_title(self, buffer_file_name, text_content, prompt):
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
-            [{"role": "system", "content": "你是一个语言学家"},
-             {"role": "user", "content": f"给下面这段话起一个标题, 标题不要带引号：\n{text}"}])
+            [{"role": "system", "content": "You are a linguist."},
+             {"role": "user", "content": f"{prompt}：\n{text}"}])
 
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
 
@@ -187,7 +187,7 @@ class MindWave:
     def action_code(self, buffer_name, buffer_file_name, major_mode, code, prompt, callback_template, notify_start, notify_end):
         text = base64.b64decode(code).decode("utf-8")
 
-        messages = [{"role": "system", "content": "你是一个计算机教授"},
+        messages = [{"role": "system", "content": "You are a computer professor."},
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         def callback(result_type, result_content):
@@ -261,7 +261,7 @@ class MindWave:
             return
 
         text = message_parts[0]
-        messages = [{"role": "system", "content": "你是语文老师"},
+        messages = [{"role": "system", "content": "You are a language teacher."},
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         response = openai.ChatCompletion.create(
