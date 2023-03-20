@@ -295,7 +295,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (define-derived-mode mind-wave-chat-mode gfm-mode "Mind-Wave"
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
-  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
   (add-to-invisibility-spec 'markdown-markup))
 
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
