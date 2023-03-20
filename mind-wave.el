@@ -4,15 +4,15 @@
 ;; Description: LSP bridge
 ;; Author: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
-;; Copyright (C) 2018, Andy Stewart, all rights reserved.
-;; Created: 2018-06-15 14:10:12
-;; Version: 0.5
-;; Last-Updated: 2022-10-10 15:23:53 +0800
-;;           By: Gong Qijian
+;; Copyright (C) 2023, Andy Stewart, all rights reserved.
+;; Created: 2023-03-09 14:10:12
+;; Version: 0.1
+;; Last-Updated: 2023-03-20 15:23:53 +0800
+;;           By: Andy Stewart
 ;; URL: https://github.com/manateelazycat/mind-wave
 ;; Keywords:
 ;; Compatibility: emacs-version >= 28
-;; Package-Requires: ((emacs "28") (posframe "1.1.7") (markdown-mode "2.6"))
+;; Package-Requires: ((emacs "28") (markdown-mode "2.6"))
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -77,6 +77,7 @@
 (require 'seq)
 (require 'subr-x)
 (require 'mind-wave-epc)
+(require 'markdown-mode)
 
 (defgroup mind-wave nil
   "Mind-Wave group."
@@ -291,6 +292,14 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     map)
   "Mind Wave Chat Keymap")
 
+(define-derived-mode mind-wave-chat-mode gfm-mode "Mind-Wave"
+  (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
+  (setq-local markdown-fontify-code-blocks-natively t)
+  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
+  (add-to-invisibility-spec 'markdown-markup))
+
+(add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
+
 (defun mind-wave-get-buffer-string ()
   (buffer-substring-no-properties (point-min) (point-max)))
 
@@ -410,14 +419,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (set-visited-file-name (format "#%s#.chat" (string-replace "/" "_" title)))
     (delete-file filename)
     (save-buffer)))
-
-(define-derived-mode mind-wave-chat-mode gfm-mode "Mind-Wave"
-  (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
-  (setq-local markdown-fontify-code-blocks-natively t)
-  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
-  (add-to-invisibility-spec 'markdown-markup))
-
-(add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
 (defun mind-wave-translate-to-english ()
   (interactive)
