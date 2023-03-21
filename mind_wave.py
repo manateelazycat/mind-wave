@@ -203,6 +203,26 @@ class MindWave:
 
         self.send_stream_request(messages, callback)
 
+    @threaded
+    def explain_word(self, buffer_name, major_mode, sentence, word, callback_template, notify_start, notify_end):
+        sentence_text = base64.b64decode(sentence).decode("utf-8")
+
+        messages = [{"role": "system", "content": f"你是一位英语词义语法专家， 你在教我英语， 我给你一句英文句子， 和这个句子中的一个单词， 请用中文帮我解释一下，这个单词在句子中的意思和句子本身的意思. 并举几个相同意思的英文例句，并用中文解释例句。如果你明白了请说同意，然后我们开始。"},
+                    {"role": "assistant", "content": "好的，我明白了，请给我这个句子和单词。"},
+                    {"role": "user", "content": f"句子是:{sentence_text}\n 单词是：{word}"}]
+
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-split-window--response",
+                          buffer_name,
+                          f"mind-wave-{callback_template}-{buffer_name}",
+                          major_mode,
+                          result_type,
+                          result_content,
+                          notify_start,
+                          notify_end)
+
+        self.send_stream_request(messages, callback)
+
     def get_video_subtitle(self, video_id):
         from youtube_transcript_api import YouTubeTranscriptApi
 

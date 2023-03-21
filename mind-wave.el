@@ -476,6 +476,19 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           "Translate done"
                           )))
 
+(defun mind-wave-explain-word ()
+  (interactive)
+  (message "Explaining word...")
+  (let ((word (thing-at-point 'word t)))
+    (mind-wave-call-async "explain_word"
+                          (buffer-name)
+                          "text-mode"
+                          (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-sentence)))
+                          word
+                          "Explain word"
+                          "ChatGPT explaining..."
+                          "ChatGPT explain finish.")))
+
 (defun mind-wave-proofreading-doc ()
   (interactive)
   (let* ((info (mind-wave-get-region-or-sexp))
@@ -504,16 +517,50 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-region translate-start translate-end)
     (insert translate)))
 
-(defun mind-wave-get-region-or-sexp ()
-  (let (translate-start translate-end)
-    (if (region-active-p)
-        (progn
-          (setq translate-start (region-beginning))
-          (setq translate-end (region-end)))
-      (setq translate-start (beginning-of-thing 'sexp))
-      (setq translate-end (end-of-thing 'sexp)))
+(defun mind-wave-current-parse-state ()
+  "Return parse state of point from beginning of defun."
+  (ignore-errors
+    (save-excursion
+      (let ((point (point)))
+        (beginning-of-defun)
+        (parse-partial-sexp (point) point)))))
 
-    (list translate-start translate-end (buffer-substring-no-properties translate-start translate-end))))
+(defun mind-wave-in-string-p (&optional state)
+  (or (nth 3 (or state (mind-wave-current-parse-state)))
+      (and
+       (eq (get-text-property (point) 'face) 'font-lock-string-face)
+       (eq (get-text-property (1- (point)) 'face) 'font-lock-string-face))
+      (and
+       (eq (get-text-property (point) 'face) 'font-lock-doc-face)
+       (eq (get-text-property (1- (point)) 'face) 'font-lock-doc-face))
+      ))
+
+(defun mind-wave-get-region-or-sexp ()
+  (save-excursion
+    (let (translate-start translate-end)
+      (if (region-active-p)
+          (progn
+            (setq translate-start (region-beginning))
+            (setq translate-end (region-end)))
+        (setq translate-start (beginning-of-thing 'sexp))
+        (setq translate-end (end-of-thing 'sexp)))
+
+      (list translate-start translate-end (buffer-substring-no-properties translate-start translate-end)))))
+
+(defun mind-wave-get-region-or-sentence ()
+  (save-excursion
+    (let (translate-start translate-end)
+      (cond ((region-active-p)
+             (setq translate-start (region-beginning))
+             (setq translate-end (region-end)))
+            ((mind-wave-in-string-p)
+             (setq translate-start (beginning-of-thing 'string))
+             (setq translate-end (end-of-thing 'string)))
+            (t
+             (setq translate-start (beginning-of-thing 'sentence))
+             (setq translate-end (end-of-thing 'sentence))))
+
+      (list translate-start translate-end (buffer-substring-no-properties translate-start translate-end)))))
 
 (defun mind-wave-get-function-node ()
   (treesit-parent-until
