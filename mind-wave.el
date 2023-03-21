@@ -550,7 +550,9 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         mind-wave-code-prompt
-                        "Please help me refactor the following code. If the code remains unchanged after refactoring, please say 'No need to refactor'."
+                        (format
+                         "Please help me refactor the following code. If the code remains unchanged after refactoring, please say 'No need to refactor'. Please interpret in %s, but don't translate the strings in the code."
+                         (mind-wave-output-lang))
                         "refactory"
                         "ChatGPT refactoring..."
                         "ChatGPT refactory finish."))
@@ -578,7 +580,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         mind-wave-code-prompt
-                        "Please explain in detail the meaning of the following code"
+                        (format "Please explain in detail the meaning of the following code, in %s" (mind-wave-output-lang))
                         "explain"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
