@@ -96,6 +96,31 @@
   :type 'boolean
   :group 'mind-wave)
 
+(defcustom mind-wave-translate-prompt "You are an English Translator."
+  "Prompt for translate."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-code-prompt "You are a computer professor."
+  "Prompt for code."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-summary-prompt "You are a language teacher."
+  "Prompt for summary."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-title-prompt "You are a linguist."
+  "Prompt for title."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-proofreading-prompt "You are a high level writer."
+  "Prompt for proofreading."
+  :type 'string
+  :group 'mind-wave)
+
 (defvar mind-wave-lang (car (split-string (getenv "LANG") "\\.")))
 
 (defvar mind-wave-server nil
@@ -422,7 +447,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (mind-wave-call-async "parse_title"
                           (buffer-file-name)
                           (mind-wave--encode-string (mind-wave-get-buffer-string))
-                          "You are a linguist."
+                          mind-wave-title-prompt
                           (format "Give the following passage a %s title without quotation marks" (mind-wave-output-lang))
                           )))
 
@@ -446,7 +471,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (mind-wave--encode-string translate-text)
                           translate-start
                           translate-end
-                          "You are an English Translator"
+                          mind-wave-translate-prompt
                           "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax"
                           "Translate done"
                           )))
@@ -463,7 +488,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (mind-wave--encode-string translate-text)
                           translate-start
                           translate-end
-                          "You are a high level writer."
+                          mind-wave-proofreading-prompt
                           (format "Please help me proofread the following paragraph with %s." (mind-wave-output-lang))
                           "Proofread done"
                           )))
@@ -524,7 +549,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "You are a computer professor."
+                        mind-wave-code-prompt
                         "Please help me refactor the following code. If the code remains unchanged after refactoring, please say 'No need to refactor'."
                         "refactory"
                         "ChatGPT refactoring..."
@@ -538,7 +563,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "You are a computer professor."
+                        mind-wave-code-prompt
                         "Please add code comments to the following code, with the comments written in English within the code, and output the code including the comments."
                         "comment"
                         "ChatGPT commenting..."
@@ -552,7 +577,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
-                        "You are a computer professor."
+                        mind-wave-code-prompt
                         "Please explain in detail the meaning of the following code"
                         "explain"
                         "ChatGPT explaining..."
@@ -576,7 +601,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     (mind-wave-call-async "summary_video"
                           (buffer-name)
                           video-id
-                          "You are a language teacher."
+                          mind-wave-summary-prompt
                           mind-wave-summary-template
                           "ChatGPT summary video..."
                           "ChatGPT summary video finish.")))
@@ -591,7 +616,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     (mind-wave-call-async "summary_web"
                           (buffer-name)
                           url
-                          "You are a language teacher."
+                          mind-wave-summary-prompt
                           mind-wave-summary-template
                           "ChatGPT summary web..."
                           "ChatGPT summary web finish.")))
