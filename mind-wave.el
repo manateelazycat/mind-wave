@@ -479,7 +479,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-explain-word ()
   (interactive)
   (message "Explaining word...")
-  (let ((word (thing-at-point 'word t)))
+  (let ((word (nth 2 (mind-wave-get-region-or-thing 'word))))
     (mind-wave-call-async "explain_word"
                           (buffer-name)
                           "text-mode"
@@ -535,17 +535,20 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
        (eq (get-text-property (1- (point)) 'face) 'font-lock-doc-face))
       ))
 
-(defun mind-wave-get-region-or-sexp ()
+(defun mind-wave-get-region-or-thing (thing)
   (save-excursion
     (let (translate-start translate-end)
       (if (region-active-p)
           (progn
             (setq translate-start (region-beginning))
             (setq translate-end (region-end)))
-        (setq translate-start (beginning-of-thing 'sexp))
-        (setq translate-end (end-of-thing 'sexp)))
+        (setq translate-start (beginning-of-thing thing))
+        (setq translate-end (end-of-thing thing)))
 
       (list translate-start translate-end (buffer-substring-no-properties translate-start translate-end)))))
+
+(defun mind-wave-get-region-or-sexp ()
+  (mind-wave-get-region-or-thing 'sexp))
 
 (defun mind-wave-get-region-or-sentence ()
   (save-excursion
