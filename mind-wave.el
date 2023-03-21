@@ -118,6 +118,11 @@
          ,@body)
        (cl-return))))
 
+(defun mind-wave-output-lang ()
+  (pcase mind-wave-lang
+    ("zh_CN" "Chinese")
+    (_ "English")))
+
 (defun mind-wave--start-epc-server ()
   "Function to start the EPC server."
   (unless (process-live-p mind-wave-server)
@@ -401,9 +406,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-chat-continue ()
   (interactive)
   (mind-wave-chat-ask-with-message
-   (pcase mind-wave-lang
-     ("zh_CN" "继续")
-     (_ "Continue"))))
+   (format "Continue, and output with %s" (mind-wave-output-lang))
+   ))
 
 (defun mind-wave-chat-generate-title ()
   (interactive)
@@ -419,9 +423,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           (buffer-file-name)
                           (mind-wave--encode-string (mind-wave-get-buffer-string))
                           "You are a linguist."
-                          (pcase mind-wave-lang
-                            ("zh_CN" "给下面这段话起一个标题, 标题不要带引号")
-                            (_ "Give the following passage a title without quotation marks"))
+                          (format "Give the following passage a %s title without quotation marks" (mind-wave-output-lang))
                           )))
 
 (defun mind-wave-parse-title--response (filename title)
@@ -462,9 +464,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           translate-start
                           translate-end
                           "You are a high level writer."
-                          (pcase mind-wave-lang
-                            ("zh_CN" "请帮我润色一下下面这段话")
-                            (_ "Please help me polish the following passage"))
+                          (format "Please help me proofread the following paragraph with %s." (mind-wave-output-lang))
                           "Proofread done"
                           )))
 
@@ -525,9 +525,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         "You are a computer professor."
-                        (pcase mind-wave-lang
-                          ("zh_CN" "请帮我重构一下下面这段代码, 如果重构后代码没有变化， 你就说 '不需要重构' ")
-                          (_ "Please help me refactor the following code, if the code does not change after refactoring, you say 'no need to refactor'"))
+                        "Please help me refactor the following code. If the code remains unchanged after refactoring, please say 'No need to refactor'."
                         "refactory"
                         "ChatGPT refactoring..."
                         "ChatGPT refactory finish."))
@@ -541,9 +539,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         "You are a computer professor."
-                        (pcase mind-wave-lang
-                          ("zh_CN" "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码")
-                          (_ "Please add code comments to the following code, require comments to be written in English in the code, and output the code including comments"))
+                        "Please add code comments to the following code, with the comments written in English within the code, and output the code including the comments."
                         "comment"
                         "ChatGPT commenting..."
                         "ChatGPT comment finish."))
@@ -557,9 +553,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         "You are a computer professor."
-                        (pcase mind-wave-lang
-                          ("zh_CN" "请详细解释一下下面这段代码的意思")
-                          (_ "Please explain in detail the meaning of the following code"))
+                        "Please explain in detail the meaning of the following code"
                         "explain"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
@@ -570,9 +564,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 - [Emoji] Bulletpoint
 
 Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in %s. Use the following text:"
-                                           (pcase mind-wave-lang
-                                             ("zh_CN" "Chinese")
-                                             (_ "English"))
+                                           (mind-wave-output-lang)
                                            ))
 
 (defun mind-wave-summary-video ()
