@@ -79,6 +79,9 @@
 (require 'mind-wave-epc)
 (require 'markdown-mode)
 
+(defun file-name-concat (&rest parts)
+  (reduce (lambda (a b) (expand-file-name b a)) parts))
+
 (defgroup mind-wave nil
   "Mind-Wave group."
   :group 'applications)
@@ -93,7 +96,7 @@
   :type 'boolean
   :group 'mind-wave)
 
-(defvar mind-wave-lang (car (string-split (getenv "LANG") "\\.")))
+(defvar mind-wave-lang (car (split-string (getenv "LANG") "\\.")))
 
 (defvar mind-wave-server nil
   "The Mind-Wave Server.")
@@ -397,7 +400,10 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-continue ()
   (interactive)
-  (mind-wave-chat-ask-with-message "继续"))
+  (mind-wave-chat-ask-with-message
+   (pcase mind-wave-lang
+     ("zh_CN" "继续")
+     (_ "Continue"))))
 
 (defun mind-wave-chat-generate-title ()
   (interactive)
@@ -568,7 +574,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
 (defun mind-wave-summary-video ()
   (interactive)
   (let ((video-id (if eaf--buffer-url
-                      (cadr (string-split eaf--buffer-url "="))
+                      (cadr (split-string eaf--buffer-url "="))
                     (read-string "YouTube Video ID: "))))
 
     (mind-wave-call-async "summary_video"
