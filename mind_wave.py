@@ -185,7 +185,7 @@ class MindWave:
         eval_in_emacs("mind-wave-adjust-text--response", buffer_file_name, result, text_start, text_end, notify_end)
 
     @threaded
-    def action_code(self, buffer_name, buffer_file_name, major_mode, code, role, prompt, callback_template, notify_start, notify_end):
+    def action_code(self, buffer_name, major_mode, code, role, prompt, callback_template, notify_start, notify_end):
         text = base64.b64decode(code).decode("utf-8")
 
         messages = [{"role": "system", "content": role},

@@ -546,7 +546,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (message "Refactoring...")
   (mind-wave-call-async "action_code"
                         (buffer-name)
-                        (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         mind-wave-code-prompt
@@ -562,7 +561,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (message "Commenting...")
   (mind-wave-call-async "action_code"
                         (buffer-name)
-                        (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         mind-wave-code-prompt
@@ -576,7 +574,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (message "Explaining...")
   (mind-wave-call-async "action_code"
                         (buffer-name)
-                        (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         mind-wave-code-prompt
