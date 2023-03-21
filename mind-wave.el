@@ -418,6 +418,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (mind-wave-call-async "parse_title"
                           (buffer-file-name)
                           (mind-wave--encode-string (mind-wave-get-buffer-string))
+                          "You are a linguist."
                           (pcase mind-wave-lang
                             ("zh_CN" "给下面这段话起一个标题, 标题不要带引号")
                             (_ "Give the following passage a title without quotation marks"))
@@ -523,6 +524,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
+                        "You are a computer professor."
                         (pcase mind-wave-lang
                           ("zh_CN" "请帮我重构一下下面这段代码, 如果重构后代码没有变化， 你就说 '不需要重构' ")
                           (_ "Please help me refactor the following code, if the code does not change after refactoring, you say 'no need to refactor'"))
@@ -538,6 +540,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
+                        "You are a computer professor."
                         (pcase mind-wave-lang
                           ("zh_CN" "请给下面这段代码增加代码注释， 要求注释用英文写在代码中， 并输出包括注释的代码")
                           (_ "Please add code comments to the following code, require comments to be written in English in the code, and output the code including comments"))
@@ -553,6 +556,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (buffer-file-name)
                         (format "%s" major-mode)
                         (mind-wave--encode-string (mind-wave-get-function-string))
+                        "You are a computer professor."
                         (pcase mind-wave-lang
                           ("zh_CN" "请详细解释一下下面这段代码的意思")
                           (_ "Please explain in detail the meaning of the following code"))
@@ -580,6 +584,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     (mind-wave-call-async "summary_video"
                           (buffer-name)
                           video-id
+                          "You are a language teacher."
                           mind-wave-summary-template
                           "ChatGPT summary video..."
                           "ChatGPT summary video finish.")))
@@ -594,6 +599,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     (mind-wave-call-async "summary_web"
                           (buffer-name)
                           url
+                          "You are a language teacher."
                           mind-wave-summary-template
                           "ChatGPT summary web..."
                           "ChatGPT summary web finish.")))

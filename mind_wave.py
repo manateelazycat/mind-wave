@@ -167,10 +167,10 @@ class MindWave:
         return messages
 
     @threaded
-    def parse_title(self, buffer_file_name, text_content, prompt):
+    def parse_title(self, buffer_file_name, text_content, role, prompt):
         text = base64.b64decode(text_content).decode("utf-8")
         (result, _) = self.send_completion_request(
-            [{"role": "system", "content": "You are a linguist."},
+            [{"role": "system", "content": role},
              {"role": "user", "content": f"{prompt}：\n{text}"}])
 
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
@@ -184,10 +184,10 @@ class MindWave:
 
         eval_in_emacs("mind-wave-adjust-text--response", buffer_file_name, result, text_start, text_end, notify_end)
 
-    def action_code(self, buffer_name, buffer_file_name, major_mode, code, prompt, callback_template, notify_start, notify_end):
+    def action_code(self, buffer_name, buffer_file_name, major_mode, code, role, prompt, callback_template, notify_start, notify_end):
         text = base64.b64decode(code).decode("utf-8")
 
-        messages = [{"role": "system", "content": "You are a computer professor."},
+        messages = [{"role": "system", "content": role},
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         def callback(result_type, result_content):
@@ -218,7 +218,7 @@ class MindWave:
         return text
 
     @threaded
-    def summary_video(self, buffer_name, video_id, prompt, notify_start, notify_end):
+    def summary_video(self, buffer_name, video_id, role, prompt, notify_start, notify_end):
         import importlib
         if importlib.find_loader("youtube_transcript_api") is None:
             message_emacs("Please use pip3 install package 'youtube_transcript_api' first.")
@@ -226,10 +226,10 @@ class MindWave:
 
         text = self.get_video_subtitle(video_id)
 
-        self.summary_text(buffer_name, prompt, notify_start, notify_end, text, video_id)
+        self.summary_text(buffer_name, role, prompt, notify_start, notify_end, text, video_id)
 
     @threaded
-    def summary_web(self, buffer_name, url, prompt, notify_start, notify_end):
+    def summary_web(self, buffer_name, url, role, prompt, notify_start, notify_end):
         import shutil
 
         if not shutil.which("readable"):
@@ -238,9 +238,9 @@ class MindWave:
 
         text = get_command_result(f"readable {url} -p 'text-content'")
 
-        self.summary_text(buffer_name, prompt, notify_start, notify_end, text, url)
+        self.summary_text(buffer_name, role, prompt, notify_start, notify_end, text, url)
 
-    def summary_text(self, buffer_name, prompt, notify_start, notify_end, text, template):
+    def summary_text(self, buffer_name, role, prompt, notify_start, notify_end, text, template):
         part_size = 3000
         message_parts = [text[i:i + part_size] for i in range(0, len(text), part_size)]
 
@@ -254,14 +254,14 @@ class MindWave:
                           notify_start,
                           notify_end)
 
-        self.send_stream_part_request(prompt, message_parts, callback)
+        self.send_stream_part_request(role, prompt, message_parts, callback)
 
-    def send_stream_part_request(self, prompt, message_parts, callback):
+    def send_stream_part_request(self, role, prompt, message_parts, callback):
         if not message_parts:
             return
 
         text = message_parts[0]
-        messages = [{"role": "system", "content": "You are a language teacher."},
+        messages = [{"role": "system", "content": role},
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         response = openai.ChatCompletion.create(
@@ -275,7 +275,7 @@ class MindWave:
             callback(result_type, result_content)
 
             if result_type == "end":
-                self.send_stream_part_request(prompt, message_parts[1:], callback)
+                self.send_stream_part_request(role, prompt, message_parts[1:], callback)
 
     def get_chunk_result(self, chunk):
         delta = chunk.choices[0].delta
