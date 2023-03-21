@@ -61,3 +61,9 @@ If the problem still exists in the `emacs -q` environment, please [submit an iss
   1. Install gdb and enable the option `(setq mind-wave-enable-debug t)`
   2. Use the command `mind-wave-restart-process` to restart the MIND-WAVE process.
   3. Send the contents of `*mind-wave*` window when the next crash occurs.
+  
+## Contributor
+
+<a href = "https://github.com/manateelazycat/mind-wave/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=manateelazycat/mind-wave"/>
+</a>

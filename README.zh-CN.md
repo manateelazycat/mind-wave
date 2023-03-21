@@ -60,3 +60,8 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
   2. 使用命令 `mind-wave-restart-process` 重启 MIND-WAVE 进程
   3. 在下次崩溃时发送 `*mind-wave*` 的内容
 
+## 贡献者
+
+<a href = "https://github.com/manateelazycat/mind-wave/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=manateelazycat/mind-wave"/>
+</a>
