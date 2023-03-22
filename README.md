@@ -49,6 +49,8 @@ Move the cursor to the desired function for refactoring.
 4. Execute the command `mind-wave-generate-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
 5. Execute the command `mind-wave-action-code`. ChatGPT will adjust the code according to your instructions.
 
+代码相关命令会自动调整窗口布局， 你随时可以用 `mind-wave-restore-window-configuration` 恢复之前的窗口布局。
+
 ### Summary Mode
 1. Open a video website and execute the command `mind-wave-summary-video`. ChatGPT will automatically retrieve the video subtitles and analyze the summary of the video (YouTube Transcript API installation is required).
 2. Open a text website and execute the command `mind-wave-summary-web`. ChatGPT will automatically retrieve the core content of the webpage and analyze the summary of the webpage (nodejs-readability-cli installation is required).

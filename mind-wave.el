@@ -587,6 +587,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
      (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition")))))
 
 (defun mind-wave-show-chat-window (buffername mode)
+  (setq mind-wave-window-configuration-before-split (current-window-configuration))
   (delete-other-windows)
   (split-window-horizontally)
   (other-window 1)
@@ -594,6 +595,12 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (switch-to-buffer buffername)
   (funcall (intern mode))
   (read-only-mode -1))
+
+(defun mind-wave-restore-window-configuration ()
+  (interactive)
+  (when mind-wave-window-configuration-before-split
+    (set-window-configuration mind-wave-window-configuration-before-split)
+    (setq mind-wave-window-configuration-before-split nil)))
 
 (defun mind-wave-refactory-code ()
   (interactive)
@@ -673,6 +680,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 Your task is to summarize the text I give you in up to seven concise  bulletpoints and start with a short, high-quality summary. Pick a suitable emoji for every bullet point. Your response should be in %s. Use the following text:"
                                            (mind-wave-output-lang)
                                            ))
+
+(defvar mind-wave-window-configuration-before-split nil)
 
 (defun mind-wave-summary-video ()
   (interactive)
