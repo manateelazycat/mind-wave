@@ -122,7 +122,8 @@
   :type 'string
   :group 'mind-wave)
 
-(defvar mind-wave-lang (car (split-string (getenv "LANG") "\\.")))
+(defvar mind-wave-lang (or (ignore-errors (car (split-string (getenv "LANG") "\\.")))
+                           (car (split-string current-language-environment "-"))))
 
 (defvar mind-wave-server nil
   "The Mind-Wave Server.")
@@ -147,6 +148,7 @@
 (defun mind-wave-output-lang ()
   (pcase mind-wave-lang
     ("zh_CN" "Chinese")
+    ("Chinese" "Chinese")
     (_ "English")))
 
 (defun mind-wave--start-epc-server ()
