@@ -462,6 +462,23 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-file filename)
     (save-buffer)))
 
+(defun mind-wave-action-text ()
+  (interactive)
+  (let* ((info (mind-wave-get-region-or-function))
+         (code-start (nth 0 info))
+         (code-end (nth 1 info))
+         (code-text (nth 2 info)))
+    (mind-wave-call-async "adjust_text"
+                          (buffer-file-name)
+                          (mind-wave--encode-string code-text)
+                          code-start
+                          code-end
+                          mind-wave-code-role
+                          (read-string "Prompt: ")
+                          "Adjust text"
+                          )
+    (message "Adjust text...")))
+
 (defun mind-wave-translate-to-english ()
   (interactive)
   (let* ((info (mind-wave-get-region-or-sexp))
@@ -642,23 +659,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         "explain"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
-
-(defun mind-wave-action-code ()
-  (interactive)
-  (let* ((info (mind-wave-get-region-or-function))
-         (code-start (nth 0 info))
-         (code-end (nth 1 info))
-         (code-text (nth 2 info)))
-    (mind-wave-call-async "adjust_text"
-                          (buffer-file-name)
-                          (mind-wave--encode-string code-text)
-                          code-start
-                          code-end
-                          mind-wave-code-role
-                          (read-string "Prompt: ")
-                          "Adjust done"
-                          )
-    (message "Adjust code...")))
 
 (defun mind-wave-generate-commit-name ()
   (interactive)

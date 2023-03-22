@@ -39,6 +39,7 @@ Selected Content:
 1. Execute the command `mind-wave-translate-to-english`, ChatGPT will automatically replace the selected area with the translated content.
 2. Execute the command `mind-wave-proofreading-doc`, ChatGPT will automatically replace the selected area with the polished document. 
 3. Execute the command `mind-wave-explain-word`, ChatGPT will automatically explain the meaning of the words in the current sentence and provide similar example sentences.
+4. Execute the command `mind-wave-action-text`. ChatGPT will adjust the text or code according to your instructions.
 
 ### Code Refactoring Mode
 Move the cursor to the desired function for refactoring.
@@ -47,7 +48,6 @@ Move the cursor to the desired function for refactoring.
 2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
 3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.
 4. Execute the command `mind-wave-generate-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
-5. Execute the command `mind-wave-action-code`. ChatGPT will adjust the code according to your instructions.
 
 代码相关命令会自动调整窗口布局， 你随时可以用 `mind-wave-restore-window-configuration` 恢复之前的窗口布局。
 
