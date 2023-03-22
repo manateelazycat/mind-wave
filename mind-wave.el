@@ -568,13 +568,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
       (list translate-start translate-end (buffer-substring-no-properties translate-start translate-end)))))
 
-(defun mind-wave-get-function-node ()
-  (treesit-parent-until
-   (treesit-node-at (point))
-   (lambda (parent)
-     (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition")))))
-
-(defun mind-wave-get-function-string ()
+(defun mind-wave-get-region-or-function ()
   (let (code-start code-end)
     (if (region-active-p)
         (progn
@@ -584,7 +578,13 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
         (setq code-start (treesit-node-start function-node))
         (setq code-end (treesit-node-end function-node))))
 
-    (buffer-substring-no-properties code-start code-end)))
+    (list code-start code-end (buffer-substring-no-properties code-start code-end))))
+
+(defun mind-wave-get-function-node ()
+  (treesit-parent-until
+   (treesit-node-at (point))
+   (lambda (parent)
+     (member (treesit-node-type parent) '("call_expression" "declaration" "function_definition")))))
 
 (defun mind-wave-show-chat-window (buffername mode)
   (delete-other-windows)
@@ -600,7 +600,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (mind-wave-call-async "action_code"
                         (buffer-name)
                         (format "%s" major-mode)
-                        (mind-wave--encode-string (mind-wave-get-function-string))
+                        (mind-wave--encode-string (nth 2 mind-wave-get-region-or-function))
                         mind-wave-code-role
                         (format
                          "Please help me refactor the following code, show explain in %s but don't translate comment in code. If the code remains unchanged after refactoring, please say 'No need to refactor'."
@@ -615,7 +615,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (mind-wave-call-async "action_code"
                         (buffer-name)
                         (format "%s" major-mode)
-                        (mind-wave--encode-string (mind-wave-get-function-string))
+                        (mind-wave--encode-string (nth 2 mind-wave-get-region-or-function))
                         mind-wave-code-role
                         "Please add code comments to the following code, with the comments written in English within the code, and output the code including the comments."
                         "comment"
@@ -628,12 +628,29 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (mind-wave-call-async "action_code"
                         (buffer-name)
                         (format "%s" major-mode)
-                        (mind-wave--encode-string (mind-wave-get-function-string))
+                        (mind-wave--encode-string (nth 2 mind-wave-get-region-or-function))
                         mind-wave-code-role
                         (format "Please explain in detail the meaning of the following code, in %s" (mind-wave-output-lang))
                         "explain"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
+
+(defun mind-wave-action-code ()
+  (interactive)
+  (let* ((info (mind-wave-get-region-or-function))
+         (code-start (nth 0 info))
+         (code-end (nth 1 info))
+         (code-text (nth 2 info)))
+    (mind-wave-call-async "adjust_text"
+                          (buffer-file-name)
+                          (mind-wave--encode-string code-text)
+                          code-start
+                          code-end
+                          mind-wave-code-role
+                          (read-string "Prompt: ")
+                          "Adjust done"
+                          )
+    (message "Adjust code...")))
 
 (defun mind-wave-generate-commit-name ()
   (interactive)
