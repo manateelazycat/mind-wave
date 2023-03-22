@@ -250,6 +250,16 @@ class MindWave:
         self.summary_text(buffer_name, role, prompt, notify_start, notify_end, text, video_id)
 
     @threaded
+    def generate_git_commit_name(self, dir, role, prompt):
+        diff_string = get_command_result(f"cd {dir} ; git diff")
+
+        (result, _) = self.send_completion_request(
+            [{"role": "system", "content": role},
+             {"role": "user", "content": f"{prompt}：\n{diff_string}"}])
+
+        eval_in_emacs("mind-wave-generate-git-commit-name--response", result)
+
+    @threaded
     def summary_web(self, buffer_name, url, role, prompt, notify_start, notify_end):
         import shutil
 

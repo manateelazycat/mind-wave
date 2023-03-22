@@ -635,6 +635,17 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
 
+(defun mind-wave-generate-git-commit-name ()
+  (interactive)
+  (mind-wave-call-async "generate_git_commit_name"
+                        default-directory
+                        mind-wave-code-role
+                        "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length."))
+
+(defun mind-wave-generate-git-commit-name--response (patch-name)
+  (when (active-minibuffer-window)
+    (insert patch-name)))
+
 (defvar mind-wave-summary-template (format "Your output should use the following template:
 ### Summary
 ### Facts

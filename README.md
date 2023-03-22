@@ -46,6 +46,7 @@ Move the cursor to the desired function for refactoring.
 1. Execute the command `mind-wave-refactory-code`, ChatGPT will automatically split the screen to display the refactored code and suggestions for improvement on the right.
 2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
 3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.
+4. Execute the command `mind-wave-generate-git-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
 
 ### Summary Mode
 1. Open a video website and execute the command `mind-wave-summary-video`. ChatGPT will automatically retrieve the video subtitles and analyze the summary of the video (YouTube Transcript API installation is required).
