@@ -79,8 +79,9 @@
 (require 'mind-wave-epc)
 (require 'markdown-mode)
 
-(defun file-name-concat (&rest parts)
-  (reduce (lambda (a b) (expand-file-name b a)) parts))
+(when (version< emacs-version "30")
+  (defun file-name-concat (&rest parts)
+    (cl-reduce (lambda (a b) (expand-file-name b a)) parts)))
 
 (defgroup mind-wave nil
   "Mind-Wave group."
