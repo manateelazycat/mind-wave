@@ -462,7 +462,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-file filename)
     (save-buffer)))
 
-(defun mind-wave-action-text ()
+(defun mind-wave-adjust-text ()
   (interactive)
   (let* ((info (mind-wave-get-region-or-function))
          (code-start (nth 0 info))

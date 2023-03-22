@@ -39,7 +39,7 @@ Selected Content:
 1. Execute the command `mind-wave-translate-to-english`, ChatGPT will automatically replace the selected area with the translated content.
 2. Execute the command `mind-wave-proofreading-doc`, ChatGPT will automatically replace the selected area with the polished document. 
 3. Execute the command `mind-wave-explain-word`, ChatGPT will automatically explain the meaning of the words in the current sentence and provide similar example sentences.
-4. Execute the command `mind-wave-action-text`. ChatGPT will adjust the text or code according to your instructions.
+4. Execute the command `mind-wave-adjust-text`. ChatGPT will adjust the text or code according to your instructions.
 
 ### Code Refactoring Mode
 Move the cursor to the desired function for refactoring.
