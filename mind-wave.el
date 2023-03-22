@@ -714,15 +714,19 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
 
 (defun mind-wave-chat-ask--response (filename type answer)
   (mind-wave--with-file-buffer filename
-    (goto-char (point-max))
     (pcase type
       ("start"
+       (goto-char (point-max))
        (insert "\n------ Assistant ------\n")
        (message "ChatGPT speaking..."))
       ("content"
-       (insert (mind-wave-decode-base64 answer)))
+       (save-excursion
+         (goto-char (point-max))
+         (insert (mind-wave-decode-base64 answer))))
       ("end"
-       (insert "\n\n")
+       (save-excursion
+         (goto-char (point-max))
+         (insert "\n\n"))
        (when mind-wave-auto-change-title
          (mind-wave-chat-parse-title nil))
        (message "ChatGPT response finish.")
@@ -741,14 +745,14 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
      (mind-wave-show-chat-window buffername mode)
      (message start-message))
     ("content"
-     (save-excursion
-       (with-current-buffer (get-buffer-create buffername)
+     (with-current-buffer (get-buffer-create buffername)
+       (save-excursion
          (goto-char (point-max))
          (insert (mind-wave-decode-base64 answer)))))
     ("end"
      (select-window (get-buffer-window buffer))
-     (save-excursion
-       (with-current-buffer (get-buffer-create buffername)
+     (with-current-buffer (get-buffer-create buffername)
+       (save-excursion
          (goto-char (point-max))
          (insert "\n\n")))
      (message end-message)
