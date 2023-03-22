@@ -257,7 +257,7 @@ class MindWave:
             [{"role": "system", "content": role},
              {"role": "user", "content": f"{prompt}：\n{diff_string}"}])
 
-        eval_in_emacs("mind-wave-generate-git-commit-name--response", result)
+        eval_in_emacs("mind-wave-generate-commit-name--response", result)
 
     @threaded
     def summary_web(self, buffer_name, url, role, prompt, notify_start, notify_end):
