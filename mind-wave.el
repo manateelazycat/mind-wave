@@ -601,7 +601,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (mind-wave--encode-string (mind-wave-get-function-string))
                         mind-wave-code-role
                         (format
-                         "Please help me refactor the following code. If the code remains unchanged after refactoring, please say 'No need to refactor'. Please interpret in %s, but don't translate the strings in the code."
+                         "Please help me refactor the following code, show explain in %s but don't translate comment in code. If the code remains unchanged after refactoring, please say 'No need to refactor'."
                          (mind-wave-output-lang))
                         "refactory"
                         "ChatGPT refactoring..."
