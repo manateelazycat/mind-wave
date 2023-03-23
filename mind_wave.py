@@ -27,7 +27,7 @@ import sys
 import base64
 from epc.server import ThreadingEPCServer
 from functools import wraps
-from utils import (get_command_result, get_emacs_var, init_epc_client, eval_in_emacs, logger, close_epc_client, message_emacs, string_to_base64)
+from utils import (get_command_result, get_emacs_var, get_emacs_vars, init_epc_client, eval_in_emacs, logger, close_epc_client, message_emacs, string_to_base64)
 
 def threaded(func):
     @wraps(func)
@@ -52,6 +52,8 @@ class MindWave:
         api_key = self.chat_get_api_key()
         if api_key is not None:
             openai.api_key = api_key
+
+        openai.api_base, openai.api_type, openai.api_version = get_emacs_vars(["mind-wave-api-base", "mind-wave-api-type", "mind-wave-api-version"])
 
         self.server.register_instance(self)  # register instance functions let elisp side call
 
