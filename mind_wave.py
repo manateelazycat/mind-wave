@@ -27,7 +27,7 @@ import sys
 import base64
 from epc.server import ThreadingEPCServer
 from functools import wraps
-from utils import (get_command_result, get_emacs_var, init_epc_client, eval_in_emacs, logger, close_epc_client, message_emacs, string_to_base64)
+from utils import (get_command_result, get_emacs_var, get_emacs_vars, init_epc_client, eval_in_emacs, logger, close_epc_client, message_emacs, string_to_base64)
 
 def threaded(func):
     @wraps(func)
@@ -53,9 +53,7 @@ class MindWave:
         if api_key is not None:
             openai.api_key = api_key
 
-        openai.api_base = self.chat_get_api_base()
-        openai.api_type = self.chat_get_api_type()
-        openai.api_version = self.chat_get_api_version()
+        openai.api_base, openai.api_type, openai.api_version = get_emacs_vars(["mind-wave-api-base", "mind-wave-api-type", "mind-wave-api-version"])
 
         self.server.register_instance(self)  # register instance functions let elisp side call
 
@@ -103,18 +101,6 @@ class MindWave:
             message_emacs(f"ChatGPT API key not found, please copy it from https://platform.openai.com/account/api-keys, and fill API key in file: {mind_wave_chat_api_key_file_path}. Or set the enviroment OPENAI_API_KEY")
 
         return key
-
-    def chat_get_api_base(self):
-        api_base = get_emacs_var("mind-wave-api-base")
-        return api_base
-
-    def chat_get_api_type(self):
-        api_type = get_emacs_var("mind-wave-api-type")
-        return api_type
-
-    def chat_get_api_version(self):
-        api_version = get_emacs_var("mind-wave-api-version")
-        return api_version
 
     def send_completion_request(self, messages):
         response = openai.ChatCompletion.create(
