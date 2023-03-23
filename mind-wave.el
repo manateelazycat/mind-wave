@@ -97,6 +97,21 @@
   :type 'boolean
   :group 'mind-wave)
 
+(defcustom mind-wave-api-base "https://api.openai.com/v1"
+  "OpenAI API base url"
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-api-type "open_ai"
+  "OpenAI API type"
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-api-version ""
+  "OpenAI API version"
+  :type 'string
+  :group 'mind-wave)
+
 (defcustom mind-wave-translate-role "You are an English Translator."
   "Role for translate."
   :type 'string
