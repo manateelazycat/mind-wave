@@ -378,14 +378,29 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
       (mind-wave-chat-ask-with-message prompt)
       )))
 
-(defun mind-wave-chat-ask-insert-line ()
-  (interactive)
+(defun mind-wave-chat-ask-insert-line-with-role (role)
   (insert (concat
            (if (equal (point) (point-min))
                ""
              "\n")
-           "------ User ------\n"))
-  (message "[Mind-Wave] Continue input, do `mind-wave-chat-ask-send-buffer` when finish input."))
+           (format "------ %s ------\n" role)))
+  (message "[Mind-Wave] Continue input, do `mind-wave-chat-ask-send-buffer` when finish input.")
+  )
+
+(defun mind-wave-chat-ask-insert-line ()
+  (interactive)
+  (mind-wave-chat-ask-insert-line-with-role "User")
+  )
+
+(defun mind-wave-chat-ask-insert-line-system ()
+  (interactive)
+  (mind-wave-chat-ask-insert-line-with-role "System")
+  )
+
+(defun mind-wave-chat-ask-insert-line-assistant ()
+  (interactive)
+  (mind-wave-chat-ask-insert-line-with-role "Assistant")
+  )
 
 (defun mind-wave-chat-ask-send-buffer ()
   (interactive)
