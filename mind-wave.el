@@ -350,6 +350,30 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (setq-local markdown-fontify-code-blocks-natively t)
   (add-to-invisibility-spec 'markdown-markup))
 
+(defun mind-wave-chat--index-function ()
+  "Create and return imenu index alist for the current buffer.
+See `imenu-create-index-function' and `imenu--index-alist' for details.
+Currently just grab the lines below '------ User ------\\n'"
+  (let (index)
+    (save-excursion
+      ;; Headings
+      (goto-char (point-min))
+      (while (re-search-forward "------ User ------\n" (point-max) t)
+        (setq index
+              (append index
+                      (list
+                       (cons
+                        (buffer-substring-no-properties
+                         (line-beginning-position) (line-end-position))
+                        (point))))))
+      index)))
+
+(add-hook 'mind-wave-chat-mode-hook
+          ;; For imenu support
+          (lambda ()
+            (setq imenu-create-index-function
+                  #'mind-wave-chat--index-function)))
+
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
 (defun mind-wave-get-buffer-string ()
