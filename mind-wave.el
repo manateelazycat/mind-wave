@@ -688,6 +688,19 @@ Currently just grab the lines below '------ User ------\\n'"
                         "ChatGPT refactoring..."
                         "ChatGPT refactory finish."))
 
+(defun mind-wave-refactory-code-with-input ()
+  (interactive)
+  (message "Refactoring...")
+  (mind-wave-call-async "action_code"
+                        (buffer-name)
+                        (format "%s" major-mode)
+                        (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-function)))
+                        mind-wave-code-role
+                        (read-string "Prompt: ")
+                        "refactory"
+                        "ChatGPT refactoring..."
+                        "ChatGPT refactory finish."))
+
 (defun mind-wave-comment-code ()
   (interactive)
   (message "Commenting...")
