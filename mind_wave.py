@@ -128,6 +128,8 @@ class MindWave:
     def chat_ask(self, buffer_file_name, buffer_content, prompt):
         content = self.chat_parse_content(buffer_content)
 
+        print(f"'{content}'")
+
         if prompt != "":
             messages = content + [{"role": "user", "content": prompt}]
         else:
@@ -143,7 +145,7 @@ class MindWave:
 
         messages = []
 
-        lines = text.split('\n')  # split the text into lines
+        lines = text.splitlines(True) # split the text into lines, and keep newline to avoid ChatGPT send back `single-line` code
         role = ''  # initialize the role
         content = ''  # initialize the content
 
@@ -151,7 +153,7 @@ class MindWave:
             if line.startswith('------ '):
                 if role:  # output the content of the previous role
                     messages.append({ "role": role, "content": content })
-                role = line.strip('------ ').strip().lower()  # get the current role
+                role = line.strip().strip('------ ').strip().lower()  # get the current role
                 content = ''  # reset the content for the current role
             else:
                 content += line  # append the line to the content for the current role
