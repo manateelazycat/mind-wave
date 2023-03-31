@@ -141,9 +141,14 @@ class MindWave:
     def chat_parse_content(self, buffer_content):
         text = base64.b64decode(buffer_content).decode("utf-8")
 
-        messages = []
+        default_system = {
+            "role": "system",
+            "content": "You are a helpful assistant."
+        }
 
-        lines = text.split('\n')  # split the text into lines
+        messages = [default_system]
+
+        lines = text.splitlines(True)  # split the text into lines
         role = ''  # initialize the role
         content = ''  # initialize the content
 
@@ -151,7 +156,7 @@ class MindWave:
             if line.startswith('------ '):
                 if role:  # output the content of the previous role
                     messages.append({ "role": role, "content": content })
-                role = line.strip('------ ').strip().lower()  # get the current role
+                role = line.strip().strip('------ ').strip().lower()  # get the current role
                 content = ''  # reset the content for the current role
             else:
                 content += line  # append the line to the content for the current role
@@ -159,12 +164,6 @@ class MindWave:
         # output the content of the last role
         if role:
             messages.append({ "role": role, "content": content })
-
-        default_system = {"role": "system", "content": "You are a helpful assistant."}
-        if len(messages) == 0:
-            messages.append(default_system)
-        elif messages[0]["role"] != "system":
-            messages = [default_system] + messages
 
         return messages
 
