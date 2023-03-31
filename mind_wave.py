@@ -87,7 +87,7 @@ class MindWave:
             logger.error(traceback.format_exc())
 
     def chat_get_api_key(self):
-        mind_wave_chat_api_key_file_path = get_emacs_var("mind-wave-api-key-path")
+        mind_wave_chat_api_key_file_path = os.path.expanduser(get_emacs_var("mind-wave-api-key-path"))
         key = None
         if os.path.exists(mind_wave_chat_api_key_file_path):
             with open(mind_wave_chat_api_key_file_path, "r") as f:
