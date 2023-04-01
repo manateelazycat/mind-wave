@@ -673,7 +673,7 @@ Currently just grab the lines below '------ User ------\\n'"
     (set-window-configuration mind-wave-window-configuration-before-split)
     (setq mind-wave-window-configuration-before-split nil)))
 
-(defun mind-wave-refactory-code ()
+(defun mind-wave-refactory-code (&optional prompt)
   (interactive)
   (message "Refactoring...")
   (mind-wave-call-async "action_code"
@@ -681,25 +681,17 @@ Currently just grab the lines below '------ User ------\\n'"
                         (format "%s" major-mode)
                         (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-function)))
                         mind-wave-code-role
-                        (format
-                         "Please help me refactor the following code. Please reply with the refactoring explanation in %s, refactored code, and diff between two versions. Please ignore the comments and strings in the code during the refactoring. If the code remains unchanged after refactoring, please say 'No need to refactor'."
-                         (mind-wave-output-lang))
+                        (or prompt
+                            (format
+                             "Please help me refactor the following code. Please reply with the refactoring explanation in %s, refactored code, and diff between two versions. Please ignore the comments and strings in the code during the refactoring. If the code remains unchanged after refactoring, please say 'No need to refactor'."
+                             (mind-wave-output-lang)))
                         "refactory"
                         "ChatGPT refactoring..."
                         "ChatGPT refactory finish."))
 
 (defun mind-wave-refactory-code-with-input ()
   (interactive)
-  (message "Refactoring...")
-  (mind-wave-call-async "action_code"
-                        (buffer-name)
-                        (format "%s" major-mode)
-                        (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-function)))
-                        mind-wave-code-role
-                        (read-string "Prompt: ")
-                        "refactory"
-                        "ChatGPT refactoring..."
-                        "ChatGPT refactory finish."))
+  (mind-wave-refactory-code (read-string "Prompt: ")))
 
 (defun mind-wave-comment-code ()
   (interactive)
