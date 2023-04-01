@@ -29,6 +29,15 @@ from epc.server import ThreadingEPCServer
 from functools import wraps
 from utils import (get_command_result, get_emacs_var, get_emacs_vars, init_epc_client, eval_in_emacs, logger, close_epc_client, message_emacs, string_to_base64)
 
+def catch_exception(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except:
+            message_emacs(traceback.format_exc())
+    return wrapper
+
 def threaded(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -102,6 +111,7 @@ class MindWave:
 
         return key
 
+    @catch_exception
     def send_completion_request(self, messages):
         response = openai.ChatCompletion.create(
             model = "gpt-3.5-turbo",
@@ -113,6 +123,7 @@ class MindWave:
 
         return (result, response)
 
+    @catch_exception
     def send_stream_request(self, messages, callback):
         response = openai.ChatCompletion.create(
             model = "gpt-3.5-turbo",
@@ -299,18 +310,21 @@ class MindWave:
         messages = [{"role": "system", "content": role},
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
-        response = openai.ChatCompletion.create(
-            model = "gpt-3.5-turbo",
-            messages = messages,
-            temperature=0,
-            stream=True)
+        try:
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                temperature=0,
+                stream=True)
 
-        for chunk in response:
-            (result_type, result_content) = self.get_chunk_result(chunk)
-            callback(result_type, result_content)
+            for chunk in response:
+                (result_type, result_content) = self.get_chunk_result(chunk)
+                callback(result_type, result_content)
 
-            if result_type == "end":
-                self.send_stream_part_request(role, prompt, message_parts[1:], callback)
+                if result_type == "end":
+                    self.send_stream_part_request(role, prompt, message_parts[1:], callback)
+        except:
+            message_emacs(traceback.format_exc())
 
     def get_chunk_result(self, chunk):
         delta = chunk.choices[0].delta
