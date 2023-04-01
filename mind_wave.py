@@ -139,8 +139,6 @@ class MindWave:
     def chat_ask(self, buffer_file_name, buffer_content, prompt):
         content = self.chat_parse_content(buffer_content)
 
-        print(f"'{content}'")
-
         if prompt != "":
             messages = content + [{"role": "user", "content": prompt}]
         else:
