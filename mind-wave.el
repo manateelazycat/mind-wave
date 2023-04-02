@@ -719,6 +719,21 @@ Currently just grab the lines below '------ User ------\\n'"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
 
+(defun mind-wave-explain-point ()
+  (interactive)
+  (message "Explaining...")
+  (let ((api (nth 2 (mind-wave-get-region-or-sexp))))
+    (mind-wave-call-async "action_code"
+                          (buffer-name)
+                          (format "%s" major-mode)
+                          (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-function)))
+                          mind-wave-code-role
+                          (format "Please briefly summarize the meaning of the following code snippet in %s within 200 words. Then, start a new paragraph to explain '%s' API in following code, with the names, types, and functions of each parameter. Finally, provide some example code using the '%s' API, presented in Markdown format."
+                                  (mind-wave-output-lang) api api)
+                          "explain"
+                          "ChatGPT explaining..."
+                          "ChatGPT explain finish.")))
+
 (defun mind-wave-generate-commit-name ()
   (interactive)
   (message "Git commit name generating...")
