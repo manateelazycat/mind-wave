@@ -47,8 +47,9 @@ Move the cursor to the desired function for refactoring.
 1. Execute the command `mind-wave-refactory-code`, ChatGPT will automatically split the screen to display the refactored code and suggestions for improvement on the right.
 2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
 3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.
-4. Execute the command `mind-wave-generate-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
-5. Execute the command `mind-wave-refactory-code-with-input`. ChatGPT will automatically split the screen and provide you with the refactored code and suggestions based on your prompts on the right side of the screen.
+4. Execute the command `mind-wave-explain-point`, ChatGPT will automatically split the screen and display the API explanation on the right side of the screen where the cursor is located.
+5. Execute the command `mind-wave-generate-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
+6. Execute the command `mind-wave-refactory-code-with-input`. ChatGPT will automatically split the screen and provide you with the refactored code and suggestions based on your prompts on the right side of the screen.
 
 Commands related to code will automatically adjust the window layout. You can use `mind-wave-restore-window-configuration` at any time to restore the previous window layout.
 
