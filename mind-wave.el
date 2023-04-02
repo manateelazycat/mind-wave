@@ -725,7 +725,7 @@ Currently just grab the lines below '------ User ------\\n'"
   (mind-wave-call-async "generate_git_commit_name"
                         default-directory
                         mind-wave-code-role
-                        "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, unless word is a proper noun or the beginning of a sentence, other words are lowercase."))
+                        "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns."))
 
 (defun mind-wave-generate-commit-name--response (patch-name)
   (when (active-minibuffer-window)
