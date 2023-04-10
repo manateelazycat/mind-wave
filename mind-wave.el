@@ -743,7 +743,8 @@ Currently just grab the lines below '------ User ------\\n'"
                         "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns."))
 
 (defun mind-wave-generate-commit-name--response (patch-name)
-  (when (active-minibuffer-window)
+  (when (and (active-minibuffer-window)
+             (= (length (minibuffer-contents)) 0))
     (insert patch-name)))
 
 (defvar mind-wave-summary-template (format "Your output should use the following template:
