@@ -139,10 +139,9 @@ class MindWave:
     def chat_ask(self, buffer_file_name, buffer_content, prompt):
         content = self.chat_parse_content(buffer_content)
 
-        if prompt != "":
+        messages = content
+        if prompt:
             messages = content + [{"role": "user", "content": prompt}]
-        else:
-            messages = content
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-chat-ask--response", buffer_file_name, result_type, result_content)
@@ -159,11 +158,14 @@ class MindWave:
         content = ''  # initialize the content
 
         for line in lines:
-            if line.startswith('------ '):
+            if line.startswith('# > ') or line.startswith('## > '):
                 if role:  # output the content of the previous role
                     messages.append({ "role": role, "content": content })
-                role = line.strip().strip('------ ').strip().lower()  # get the current role
-                content = ''  # reset the content for the current role
+                begin = line.find('>') + 1 # add 1 to move pass the char >
+                end = line.find(':')
+                role = line[begin:end].strip().lower()  # get the current role
+                # reset the content for the current role
+                content = line[end + 2:]  # add 2 to move pass `: `
             else:
                 content += line  # append the line to the content for the current role
 
