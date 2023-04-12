@@ -92,6 +92,11 @@
   :type 'boolean
   :group 'mind-wave)
 
+(defcustom mind-wave-auto-update-old-chats t
+  "Whether to automatically update the old chat buffer to new one."
+  :type 'boolean
+  :group 'mind-wave)
+
 (defcustom mind-wave-api-key-path (expand-file-name (file-name-concat user-emacs-directory "mind-wave" "chatgpt_api_key.txt"))
   "The path to store OpenAI API Key."
   :type 'boolean
@@ -348,7 +353,9 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (define-derived-mode mind-wave-chat-mode gfm-mode "Mind-Wave"
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
-  (add-to-invisibility-spec 'markdown-markup))
+  (add-to-invisibility-spec 'markdown-markup)
+  (when mind-wave-auto-update-old-chats
+      (mind-wave--update-chat-buffer-to-new-version)))
 
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
@@ -407,6 +414,8 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (goto-char (line-end-position))
   (insert "\n")
   (message "Wait ChatGPT...")
+  (when mind-wave-auto-update-old-chats
+    (mind-wave--update-chat-buffer-to-new-version))
   (mind-wave-call-async "chat_ask"
                         (buffer-file-name)
                         (mind-wave--encode-string (mind-wave-get-buffer-string))
@@ -808,6 +817,19 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
          (insert "\n\n")))
      (message end-message)
      )))
+
+(defun mind-wave--update-chat-buffer-to-new-version ()
+  "Replace old markers in buffer with new ones."
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^------ User ------\n" nil t)
+      (replace-match "# > User: "))
+    (goto-char (point-min))
+    (while (re-search-forward "^------ System ------\n" nil t)
+      (replace-match "# > System: "))
+    (goto-char (point-min))
+    (while (re-search-forward "^------ Assistant ------\n" nil t)
+      (replace-match "## > Assistant: "))))
 
 (provide 'mind-wave)
 
