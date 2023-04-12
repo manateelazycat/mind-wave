@@ -6,7 +6,7 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2023, Andy Stewart, all rights reserved.
 ;; Created: 2023-03-09 14:10:12
-;; Version: 0.1
+;; Version: 0.2
 ;; Last-Updated: 2023-03-20 15:23:53 +0800
 ;;           By: Andy Stewart
 ;; URL: https://github.com/manateelazycat/mind-wave
@@ -89,6 +89,11 @@
 
 (defcustom mind-wave-auto-change-title t
   "Whether to automatically change the title according to the content."
+  :type 'boolean
+  :group 'mind-wave)
+
+(defcustom mind-wave-auto-update-old-chats t
+  "Whether to automatically update the old chat buffer to new one."
   :type 'boolean
   :group 'mind-wave)
 
@@ -341,38 +346,16 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (define-key map (kbd "C-,")   #'mind-wave-chat-ask-insert-line)
     (define-key map (kbd "C-S-m") #'mind-wave-chat-ask-send-buffer)
     (define-key map (kbd "C-u")   #'mind-wave-chat-continue)
-    (define-key map (kbd "C-i")   #'mind-wave-chat-generate-title)
+    (define-key map (kbd "C-c C-i")   #'mind-wave-chat-generate-title)
     map)
   "Mind Wave Chat Keymap")
 
 (define-derived-mode mind-wave-chat-mode gfm-mode "Mind-Wave"
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
-  (add-to-invisibility-spec 'markdown-markup))
-
-(defun mind-wave-chat--index-function ()
-  "Create and return imenu index alist for the current buffer.
-See `imenu-create-index-function' and `imenu--index-alist' for details.
-Currently just grab the lines below '------ User ------\\n'"
-  (let (index)
-    (save-excursion
-      ;; Headings
-      (goto-char (point-min))
-      (while (re-search-forward "------ User ------\n" (point-max) t)
-        (setq index
-              (append index
-                      (list
-                       (cons
-                        (buffer-substring-no-properties
-                         (line-beginning-position) (line-end-position))
-                        (point))))))
-      index)))
-
-(add-hook 'mind-wave-chat-mode-hook
-          ;; For imenu support
-          (lambda ()
-            (setq imenu-create-index-function
-                  #'mind-wave-chat--index-function)))
+  (add-to-invisibility-spec 'markdown-markup)
+  (when mind-wave-auto-update-old-chats
+      (mind-wave--update-chat-buffer-to-new-version)))
 
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
@@ -384,7 +367,7 @@ Currently just grab the lines below '------ User ------\\n'"
     (goto-char (point-max))
     (unless (equal (point) (point-min))
       (insert "\n"))
-    (insert "------ User ------\n")
+    (insert "# > User: ")
     (insert (format "%s\n\n" prompt)))
 
   (message "Wait ChatGPT...")
@@ -431,6 +414,8 @@ Currently just grab the lines below '------ User ------\\n'"
   (goto-char (line-end-position))
   (insert "\n")
   (message "Wait ChatGPT...")
+  (when mind-wave-auto-update-old-chats
+    (mind-wave--update-chat-buffer-to-new-version))
   (mind-wave-call-async "chat_ask"
                         (buffer-file-name)
                         (mind-wave--encode-string (mind-wave-get-buffer-string))
@@ -792,7 +777,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
     (pcase type
       ("start"
        (goto-char (point-max))
-       (insert "\n------ Assistant ------\n")
+       (insert "## > Assistant: ")
        (message "ChatGPT speaking..."))
       ("content"
        (save-excursion
@@ -832,6 +817,19 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
          (insert "\n\n")))
      (message end-message)
      )))
+
+(defun mind-wave--update-chat-buffer-to-new-version ()
+  "Replace old markers in buffer with new ones."
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^------ User ------\n" nil t)
+      (replace-match "# > User: "))
+    (goto-char (point-min))
+    (while (re-search-forward "^------ System ------\n" nil t)
+      (replace-match "# > System: "))
+    (goto-char (point-min))
+    (while (re-search-forward "^------ Assistant ------\n" nil t)
+      (replace-match "## > Assistant: "))))
 
 (provide 'mind-wave)
 
