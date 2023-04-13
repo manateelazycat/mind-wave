@@ -355,7 +355,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (setq-local markdown-fontify-code-blocks-natively t)
   (add-to-invisibility-spec 'markdown-markup)
   (when mind-wave-auto-update-old-chats
-      (mind-wave--update-chat-buffer-to-new-version)))
+    (mind-wave--update-chat-buffer-to-new-version)))
 
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
@@ -387,26 +387,24 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-ask-insert-line-with-role (role)
   (insert (concat
-           (if (equal (point) (point-min))
-               ""
-             "\n")
-           (format "------ %s ------\n" role)))
+           (if (equal (point) (point-min)) "" "\n")
+           role))
   (message "[Mind-Wave] Continue input, do `mind-wave-chat-ask-send-buffer` when finish input.")
   )
 
 (defun mind-wave-chat-ask-insert-line ()
   (interactive)
-  (mind-wave-chat-ask-insert-line-with-role "User")
+  (mind-wave-chat-ask-insert-line-with-role "# > User: ")
   )
 
 (defun mind-wave-chat-ask-insert-line-system ()
   (interactive)
-  (mind-wave-chat-ask-insert-line-with-role "System")
+  (mind-wave-chat-ask-insert-line-with-role "# > System: ")
   )
 
 (defun mind-wave-chat-ask-insert-line-assistant ()
   (interactive)
-  (mind-wave-chat-ask-insert-line-with-role "Assistant")
+  (mind-wave-chat-ask-insert-line-with-role "## > Assistant: ")
   )
 
 (defun mind-wave-chat-ask-send-buffer ()
