@@ -507,7 +507,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (point)
                         (point)
                         mind-wave-code-role
-                        (read-string "Prompt: ")
+                        (format "%s, 只输出代码， 不要带任何解释和说明。" (read-string "Prompt: "))
                         "Generate..."
                         "Generate code done."
                         ))
