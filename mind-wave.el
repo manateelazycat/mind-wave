@@ -505,16 +505,16 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
          (code-start (nth 0 info))
          (code-end (nth 1 info))
          (code-text (nth 2 info)))
-    (mind-wave-call-async "adjust_text"
+    (mind-wave-call-async "async_text"
                           (buffer-file-name)
                           (mind-wave--encode-string code-text)
                           code-start
                           code-end
                           mind-wave-code-role
                           (read-string "Prompt: ")
+                          "Adjust..."
                           "Adjust text"
-                          )
-    (message "Adjust text...")))
+                          )))
 
 (defun mind-wave-translate-to-english ()
   (interactive)
@@ -522,15 +522,32 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
          (translate-start (nth 0 info))
          (translate-end (nth 1 info))
          (translate-text (nth 2 info)))
-    (message "Translate...")
-    (mind-wave-call-async "adjust_text"
+    (mind-wave-call-async "async_text"
                           (buffer-file-name)
                           (mind-wave--encode-string translate-text)
                           translate-start
                           translate-end
                           mind-wave-translate-role
                           "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax"
+                          "Translate..."
                           "Translate done"
+                          )))
+
+(defun mind-wave-proofreading-doc ()
+  (interactive)
+  (let* ((info (mind-wave-get-region-or-sexp))
+         (translate-start (nth 0 info))
+         (translate-end (nth 1 info))
+         (translate-text (nth 2 info)))
+    (mind-wave-call-async "async_text"
+                          (buffer-file-name)
+                          (mind-wave--encode-string translate-text)
+                          translate-start
+                          translate-end
+                          mind-wave-proofreading-role
+                          (format "Please help me proofread and polish the following text in %s, but do not include 'Here is the revised Chinese paragraph' in the response, do not change the output format, including details such as line breaks." (mind-wave-output-lang))
+                          "Proofread..."
+                          "Proofread done"
                           )))
 
 (defun mind-wave-explain-word ()
@@ -545,34 +562,6 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           "Explain word"
                           "ChatGPT explaining..."
                           "ChatGPT explain finish.")))
-
-(defun mind-wave-proofreading-doc ()
-  (interactive)
-  (let* ((info (mind-wave-get-region-or-sexp))
-         (translate-start (nth 0 info))
-         (translate-end (nth 1 info))
-         (translate-text (nth 2 info)))
-    (message "Proofreading...")
-    (mind-wave-call-async "adjust_text"
-                          (buffer-file-name)
-                          (mind-wave--encode-string translate-text)
-                          translate-start
-                          translate-end
-                          mind-wave-proofreading-role
-                          (format "Please help me proofread the following paragraph with %s." (mind-wave-output-lang))
-                          "Proofread done"
-                          )))
-
-(defun mind-wave-adjust-text--response (filename translate translate-start translate-end notify-end)
-  (message notify-end)
-  (mind-wave--with-file-buffer
-      filename
-    (when (region-active-p)
-      (deactivate-mark))
-
-    (goto-char translate-start)
-    (delete-region translate-start translate-end)
-    (insert translate)))
 
 (defun mind-wave-current-parse-state ()
   "Return parse state of point from beginning of defun."
@@ -789,6 +778,32 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
          (mind-wave-chat-parse-title nil))
        (message "ChatGPT response finish.")
        ))))
+
+(defun mind-wave-async-text--response (filename
+                                       type
+                                       answer
+                                       text-start
+                                       text-end
+                                       start-message
+                                       end-message)
+  (pcase type
+    ("start"
+     (mind-wave--with-file-buffer
+         filename
+       (when (region-active-p)
+         (deactivate-mark))
+
+       (goto-char text-start)
+       (delete-region text-start text-end))
+
+     (message start-message))
+    ("content"
+     (mind-wave--with-file-buffer
+         filename
+       (insert (mind-wave-decode-base64 answer))))
+    ("end"
+     (message end-message)
+     )))
 
 (defun mind-wave-split-window--response (buffer
                                          buffername

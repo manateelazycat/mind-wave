@@ -191,13 +191,23 @@ class MindWave:
         eval_in_emacs("mind-wave-parse-title--response", buffer_file_name, result)
 
     @threaded
-    def adjust_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_end):
+    def async_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_start, notify_end):
         text = base64.b64decode(text_content).decode("utf-8")
-        (result, _) = self.send_completion_request(
-            [{"role": "system", "content": role},
-             {"role": "user", "content": f"{prompt}：\n{text}"}])
 
-        eval_in_emacs("mind-wave-adjust-text--response", buffer_file_name, result, text_start, text_end, notify_end)
+        messages = [{"role": "system", "content": role},
+             {"role": "user", "content": f"{prompt}：\n{text}"}]
+
+        def callback(result_type, result_content):
+            eval_in_emacs("mind-wave-async-text--response",
+                          buffer_file_name,
+                          result_type,
+                          result_content,
+                          text_start,
+                          text_end,
+                          notify_start,
+                          notify_end)
+
+        self.send_stream_request(messages, callback)
 
     @threaded
     def action_code(self, buffer_name, major_mode, code, role, prompt, callback_template, notify_start, notify_end):
