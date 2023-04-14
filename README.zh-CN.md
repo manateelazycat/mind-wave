@@ -43,12 +43,13 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 ### 代码模式
 光标移动到想要重构的函数
 
-1. 执行命令 `mind-wave-refactory-code`, ChatGPT 会自动分屏， 在屏幕右边先后重构后的代码和重构建议
-2. 执行命令 `mind-wave-comment-code`, ChatGPT 会自动分屏， 在屏幕右边显示带注释的代码
-3. 执行命令 `mind-wave-explain-code`, ChatGPT 会自动分屏， 在屏幕右边显示代码的讲解
-4. 执行命令 `mind-wave-explain-point`, ChatGPT 会自动分屏， 在屏幕右边显示光标处 API 的讲解
-5. 执行命令 `mind-wave-generate-commit-name`, ChatGPT 会自动分析当前的 diff 内容， 并生成一个补丁名称
-6. 执行命令 `mind-wave-refactory-code-with-input`, ChatGPT 会自动分屏， 根据你的提示， 在屏幕右边先后重构后的代码和重构建议
+1. 执行命令 `mind-wave-generate-code`, ChatGPT 会根据提示， 在当前 buffer 输出代码
+2. 执行命令 `mind-wave-refactory-code`, ChatGPT 会自动分屏， 在屏幕右边先后重构后的代码和重构建议
+3. 执行命令 `mind-wave-comment-code`, ChatGPT 会自动分屏， 在屏幕右边显示带注释的代码
+4. 执行命令 `mind-wave-explain-code`, ChatGPT 会自动分屏， 在屏幕右边显示代码的讲解
+5. 执行命令 `mind-wave-explain-point`, ChatGPT 会自动分屏， 在屏幕右边显示光标处 API 的讲解
+6. 执行命令 `mind-wave-generate-commit-name`, ChatGPT 会自动分析当前的 diff 内容， 并生成一个补丁名称
+7. 执行命令 `mind-wave-refactory-code-with-input`, ChatGPT 会自动分屏， 根据你的提示， 在屏幕右边先后重构后的代码和重构建议
 
 代码相关命令会自动调整窗口布局， 你随时可以用 `mind-wave-restore-window-configuration` 恢复之前的窗口布局。
 

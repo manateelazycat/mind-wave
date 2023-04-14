@@ -41,17 +41,18 @@ Selected Content:
 3. Execute the command `mind-wave-explain-word`, ChatGPT will automatically explain the meaning of the words in the current sentence and provide similar example sentences.
 4. Execute the command `mind-wave-adjust-text`. ChatGPT will adjust the text or code according to your instructions.
 
-### Code Refactoring Mode
-Move the cursor to the desired function for refactoring.
+### Code Mode
+Move the cursor to the function you want to refactor.
 
-1. Execute the command `mind-wave-refactory-code`, ChatGPT will automatically split the screen to display the refactored code and suggestions for improvement on the right.
-2. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen to display code with comments on the right.
-3. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen to display an explanation for the code on the right.
-4. Execute the command `mind-wave-explain-point`, ChatGPT will automatically split the screen and display the API explanation on the right side of the screen where the cursor is located.
-5. Execute the command `mind-wave-generate-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
-6. Execute the command `mind-wave-refactory-code-with-input`. ChatGPT will automatically split the screen and provide you with the refactored code and suggestions based on your prompts on the right side of the screen.
+1. Execute the command `mind-wave-generate-code`, ChatGPT will output the code in the current buffer according to the prompt.
+2. Execute the command `mind-wave-refactory-code`, ChatGPT will automatically split the screen and display the refactored code and suggestions on the right side of the screen.
+3. Execute the command `mind-wave-comment-code`, ChatGPT will automatically split the screen and display the commented code on the right side of the screen.
+4. Execute the command `mind-wave-explain-code`, ChatGPT will automatically split the screen and display the explanation of the code on the right side of the screen.
+5. Execute the command `mind-wave-explain-point`, ChatGPT will automatically split the screen and display the explanation of the API at the cursor position on the right side of the screen.
+6. Execute the command `mind-wave-generate-commit-name`, ChatGPT will automatically analyze the current diff content and generate a patch name.
+7. Execute the command `mind-wave-refactory-code-with-input`, ChatGPT will automatically split the screen and display the refactored code and suggestions on the right side of the screen according to your prompt.
 
-Commands related to code will automatically adjust the window layout. You can use `mind-wave-restore-window-configuration` at any time to restore the previous window layout.
+Code-related commands will automatically adjust the window layout, and you can use `mind-wave-restore-window-configuration` to restore the previous window layout at any time.
 
 ### Summary Mode
 1. Open a video website and execute the command `mind-wave-summary-video`. ChatGPT will automatically retrieve the video subtitles and analyze the summary of the video (YouTube Transcript API installation is required).

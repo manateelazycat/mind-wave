@@ -194,8 +194,13 @@ class MindWave:
     def async_text(self, buffer_file_name, text_content, text_start, text_end, role, prompt, notify_start, notify_end):
         text = base64.b64decode(text_content).decode("utf-8")
 
+        if text_content == "":
+            content = f"{prompt}"
+        else:
+            content = f"{prompt}：\n{text}"
+
         messages = [{"role": "system", "content": role},
-             {"role": "user", "content": f"{prompt}：\n{text}"}]
+                    {"role": "user", "content": content}]
 
         def callback(result_type, result_content):
             eval_in_emacs("mind-wave-async-text--response",

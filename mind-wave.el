@@ -499,6 +499,19 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
     (delete-file filename)
     (save-buffer)))
 
+(defun mind-wave-generate-code ()
+  (interactive)
+  (mind-wave-call-async "async_text"
+                        (buffer-file-name)
+                        (mind-wave--encode-string "")
+                        (point)
+                        (point)
+                        mind-wave-code-role
+                        (read-string "Prompt: ")
+                        "Generate..."
+                        "Generate code done."
+                        ))
+
 (defun mind-wave-adjust-text ()
   (interactive)
   (let* ((info (mind-wave-get-region-or-function))
