@@ -772,10 +772,14 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
                           "ChatGPT summary web..."
                           "ChatGPT summary web finish.")))
 
+(defvar-local mind-wave-is-response-p nil)
+
 (defun mind-wave-chat-ask--response (filename type answer)
   (mind-wave--with-file-buffer filename
     (pcase type
       ("start"
+       (setq-local mind-wave-is-response-p t)
+
        (goto-char (point-max))
        (insert "## > Assistant: ")
        (message "ChatGPT speaking..."))
@@ -789,6 +793,9 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
          (insert "\n\n"))
        (when mind-wave-auto-change-title
          (mind-wave-chat-parse-title nil))
+
+       (run-with-timer 1 nil (lambda() (setq-local mind-wave-is-response-p nil)))
+
        (message "ChatGPT response finish.")
        ))))
 
@@ -799,10 +806,11 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
                                        text-end
                                        start-message
                                        end-message)
-  (mind-wave--with-file-buffer
-      filename
+  (mind-wave--with-file-buffer filename
     (pcase type
       ("start"
+       (setq-local mind-wave-is-response-p t)
+
        (when (region-active-p)
          (deactivate-mark))
 
@@ -820,6 +828,7 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
       ("content"
        (insert (mind-wave-decode-base64 answer)))
       ("end"
+       (run-with-timer 1 nil (lambda() (setq-local mind-wave-is-response-p nil)))
        (message end-message)
        ))))
 
@@ -832,6 +841,8 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
                                          end-message)
   (pcase type
     ("start"
+     (setq-local mind-wave-is-response-p t)
+
      (select-window (get-buffer-window buffer))
      (mind-wave-show-chat-window buffername mode)
      (message start-message))
@@ -846,6 +857,8 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
        (save-excursion
          (goto-char (point-max))
          (insert "\n\n")))
+
+     (run-with-timer 1 nil (lambda() (setq-local mind-wave-is-response-p nil)))
      (message end-message)
      )))
 
