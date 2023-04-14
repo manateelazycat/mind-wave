@@ -799,24 +799,29 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
                                        text-end
                                        start-message
                                        end-message)
-  (pcase type
-    ("start"
-     (mind-wave--with-file-buffer
-         filename
+  (mind-wave--with-file-buffer
+      filename
+    (pcase type
+      ("start"
        (when (region-active-p)
          (deactivate-mark))
 
        (goto-char text-start)
-       (delete-region text-start text-end))
+       (delete-region
+        text-start
+        ;; Backward to end of previous line if `text-end' is at beginning of line.
+        (save-excursion
+          (goto-char text-end)
+          (if (bolp)
+              (max text-start (1- text-end))
+            text-end)))
 
-     (message start-message))
-    ("content"
-     (mind-wave--with-file-buffer
-         filename
-       (insert (mind-wave-decode-base64 answer))))
-    ("end"
-     (message end-message)
-     )))
+       (message start-message))
+      ("content"
+       (insert (mind-wave-decode-base64 answer)))
+      ("end"
+       (message end-message)
+       ))))
 
 (defun mind-wave-split-window--response (buffer
                                          buffername
