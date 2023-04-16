@@ -699,7 +699,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         (format "%s" major-mode)
                         (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-function)))
                         mind-wave-code-role
-                        (format "Please explain in detail the meaning of the following code, in %s" (mind-wave-output-lang))
+                        (format "Please explain in detail the meaning of the following code, in %s, leave a blank line between each sentence." (mind-wave-output-lang))
                         "explain"
                         "ChatGPT explaining..."
                         "ChatGPT explain finish."))
