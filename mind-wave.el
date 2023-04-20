@@ -360,7 +360,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (add-to-list 'auto-mode-alist '("\\.chat$" . mind-wave-chat-mode))
 
 (defun mind-wave-get-buffer-string ()
-  (buffer-substring-no-properties (point-min) (point-max)))
+  (buffer-substring-no-properties (max (point-min) (- (point-max) 4096))  (point-max)))
 
 (defun mind-wave-chat-ask-with-message (prompt)
   (save-excursion
