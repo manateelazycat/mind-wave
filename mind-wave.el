@@ -725,7 +725,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (mind-wave-call-async "generate_git_commit_name"
                         default-directory
                         mind-wave-code-role
-                        "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns."))
+                        "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns, if the diff content starts with 'Subproject commit', you extract the submodule name 'xxx', and reply 'Update xxx modules'."))
 
 (defun mind-wave-generate-commit-name--response (patch-name)
   (when (and (active-minibuffer-window)
