@@ -79,7 +79,7 @@
 (require 'mind-wave-epc)
 (require 'markdown-mode)
 
-(when (version< emacs-version "30")
+(when (version< emacs-version "28.1")
   (defun file-name-concat (&rest parts)
     (cl-reduce (lambda (a b) (expand-file-name b a)) parts)))
 
