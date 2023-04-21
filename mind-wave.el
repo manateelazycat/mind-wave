@@ -79,10 +79,6 @@
 (require 'mind-wave-epc)
 (require 'markdown-mode)
 
-(when (version< emacs-version "30")
-  (defun file-name-concat (&rest parts)
-    (cl-reduce (lambda (a b) (expand-file-name b a)) parts)))
-
 (defgroup mind-wave nil
   "Mind-Wave group."
   :group 'applications)
@@ -97,7 +93,7 @@
   :type 'boolean
   :group 'mind-wave)
 
-(defcustom mind-wave-api-key-path (expand-file-name (file-name-concat user-emacs-directory "mind-wave" "chatgpt_api_key.txt"))
+(defcustom mind-wave-api-key-path (expand-file-name (concat user-emacs-directory (file-name-as-directory "mind-wave") "chatgpt_api_key.txt"))
   "The path to store OpenAI API Key."
   :type 'boolean
   :group 'mind-wave)
