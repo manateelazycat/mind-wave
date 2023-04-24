@@ -497,16 +497,21 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-generate-code ()
   (interactive)
-  (mind-wave-call-async "async_text"
-                        (buffer-file-name)
-                        (mind-wave--encode-string "")
-                        (point)
-                        (point)
-                        mind-wave-code-role
-                        (format "%s, 只输出代码， 不要带任何解释和说明。" (read-string "Prompt: "))
-                        "Generate..."
-                        "Generate code done."
-                        ))
+  (let* ((selection (if (region-active-p)
+                        (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+         (mode (replace-regexp-in-string "-mode$" "" (symbol-name major-mode)))
+         (prompt (if (= (length selection) 0)
+                     (format "%s, 只输出代码， 不要带任何解释和说明。" (read-string "Prompt: "))
+                   (format "%s, 只输出代码， 不要带任何解释和说明。" (concat mode " " selection)))))
+    (mind-wave-call-async "async_text"
+                          (buffer-file-name)
+                          (mind-wave--encode-string "")
+                          (point)
+                          (point)
+                          mind-wave-code-role
+                          prompt
+                          "Generate..."
+                          "Generate code done.")))
 
 (defun mind-wave-adjust-text ()
   (interactive)
