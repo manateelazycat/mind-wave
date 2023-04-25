@@ -632,6 +632,18 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
     (list code-start code-end (buffer-substring-no-properties code-start code-end))))
 
+(defun mind-wave-get-region-or-buffer ()
+  (let (code-start code-end)
+    (if (region-active-p)
+        (progn
+          (setq code-start (region-beginning))
+          (setq code-end (region-end)))
+      (let ((function-node (mind-wave-get-function-node)))
+        (setq code-start (point-min))
+        (setq code-end (point-max))))
+
+    (list code-start code-end (buffer-substring-no-properties code-start code-end))))
+
 (defun mind-wave-get-function-node ()
   (treesit-parent-until
    (treesit-node-at (point))
@@ -714,6 +726,19 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           "explain"
                           "ChatGPT explaining..."
                           "ChatGPT explain finish.")))
+
+(defun mind-wave-check-typos ()
+  (interactive)
+  (message "Checking...")
+  (mind-wave-call-async "action_code"
+                        (buffer-name)
+                        "text-mode"
+                        (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-buffer)))
+                        mind-wave-summary-role
+                        "请检查下面内容的中文错别字。 回答请用 ```'索引': '错别字' - '修改建议'``` 的格式来回答， 其中 '索引' 是指错别字相对于下面内容的行偏移。 如果没有错别字请忽略。 请用中文回答。 "
+                        "typos"
+                        "ChatGPT checking..."
+                        "ChatGPT check finish."))
 
 (defun mind-wave-generate-commit-name ()
   (interactive)

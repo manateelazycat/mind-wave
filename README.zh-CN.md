@@ -39,6 +39,7 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 2. 执行命令 `mind-wave-proofreading-doc`，ChatGPT 会用润色后的文档自动替换选中区域的内容。
 3. 执行命令 `mind-wave-explain-word`, ChatGPT 会自动解释当前句子中单词的意思， 并给出类似例句。
 4. 执行命令 `mind-wave-adjust-text`, ChatGPT 根据你的指令来调整文字或代码
+5. 执行命令 `mind-wave-check-typos`, ChatGPT 修复错别字
 
 ### 代码模式
 光标移动到想要重构的函数
