@@ -499,7 +499,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (interactive)
   (let* ((selection (if (region-active-p)
                         (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
-         (mode (replace-regexp-in-string "-mode$" "" (symbol-name major-mode)))
+         (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
          (prompt (if (= (length selection) 0)
                      (format "%s, 只输出代码， 不要带任何解释和说明。" (read-string "Prompt: "))
                    (format "%s, 只输出代码， 不要带任何解释和说明。" (concat mode " " selection)))))
