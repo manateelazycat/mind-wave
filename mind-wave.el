@@ -503,6 +503,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
          (prompt (if (= (length selection) 0)
                      (format "%s, 只输出代码， 不要带任何解释和说明。" (read-string "Prompt: "))
                    (format "%s, 只输出代码， 不要带任何解释和说明。" (concat mode " " selection)))))
+    (insert "\n")
     (mind-wave-call-async "async_text"
                           (buffer-file-name)
                           (mind-wave--encode-string "")
