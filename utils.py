@@ -27,6 +27,7 @@ import logging
 import pathlib
 import platform
 import sys
+import base64
 
 from epc.client import EPCClient
 
@@ -230,3 +231,5 @@ def string_to_base64(text):
 
     return base64_string
 
+def decode_text(buffer_content):
+    return base64.b64decode(buffer_content).decode("utf-8")
