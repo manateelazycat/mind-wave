@@ -58,6 +58,16 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
 1. 打开视频网站, 执行命令 `mind-wave-summary-video`, ChatGPT 会自动获取视频字幕， 并分析视频概要 (需要安装 `youtube_transcript_api`)
 2. 打开文本网站, 执行命令 `mind-wave-summary-web`, ChatGPT 会自动获取网页中的核心内容， 并分析网页概要 (需要安装 `nodejs-readability-cli`)
 
+## 模型选择
+mind-wave 默认使用 `gpt-3.5-turbo` 模型， 如果你已经获得了 OpenAI 的内部测试邀请， 你可以设置下面模型为 `gpt-4` or `gpt-4-32k`.
+
+* mind-wave-chat-model: Chat 文件聊天模型， 默认是 `gpt-3.5-turbo`, 你可以使用 `mind-wave-chat-model` 命令来切换模型
+* mind-wave-async-text-model: 异步文字模型， 默认是 `gpt-3.5-turbo`
+* mind-wave-action-code-model: 异步代码模型， 默认是 `gpt-3.5-turbo`
+* mind-wave-explain-word-model: 英文单词解释模型， 默认是 `gpt-3.5-turbo`
+* mind-wave-parse-title-model: 分析 chat 文件标题模型， 默认是 `gpt-3.5-turbo`, 建议不用切换成 `gpt-4`, `gpt-4`速度较慢
+* mind-wave-git-commit-model: 生成 git diff 模型， 默认是 `gpt-3.5-turbo`, 建议不用切换成 `gpt-4`, `gpt-4`速度较慢
+
 ## 反馈问题
 请用命令 `emacs -q` 并只添加 mind-wave 配置做一个对比测试，如果 `emacs -q` 可以正常工作，请检查你个人的配置文件。
 
@@ -67,7 +77,7 @@ mind-wave 是一款利用 ChatGPT API 开发的 Emacs AI 插件，能够深度�
   1. 先安装 gdb 并打开选项 `(setq mind-wave-enable-debug t)`
   2. 使用命令 `mind-wave-restart-process` 重启 MIND-WAVE 进程
   3. 在下次崩溃时发送 `*mind-wave*` 的内容
-
+  
 ## 贡献者
 
 <a href = "https://github.com/manateelazycat/mind-wave/graphs/contributors">

@@ -138,6 +138,36 @@
   :type 'string
   :group 'mind-wave)
 
+(defcustom mind-wave-chat-model "gpt-3.5-turbo"
+  "Default model for chat."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-async-text-model "gpt-3.5-turbo"
+  "Default model for async_text API."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-action-code-model "gpt-3.5-turbo"
+  "Default model for action_code API."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-explain-word-model "gpt-3.5-turbo"
+  "Default model for explain_word API."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-parse-title-model "gpt-3.5-turbo"
+  "Default model for parse_title API."
+  :type 'string
+  :group 'mind-wave)
+
+(defcustom mind-wave-git-commit-model "gpt-3.5-turbo"
+  "Default model for git_commit API."
+  :type 'string
+  :group 'mind-wave)
+
 (defvar mind-wave-lang (or (ignore-errors (car (split-string (getenv "LANG") "\\.")))
                            (car (split-string current-language-environment "-"))))
 
@@ -360,9 +390,11 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-ask-with-message (prompt)
   (save-excursion
-    (goto-char (point-max))
-    (unless (equal (point) (point-min))
-      (insert "\n"))
+    (goto-char (point-min))
+    (unless (search-forward-regexp "# : " nil t)
+      (goto-char (point-min))
+      (insert (format "# : %s\n\n" mind-wave-chat-model)))
+
     (insert "# > User: ")
     (insert (format "%s\n\n" prompt)))
 
@@ -749,7 +781,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 (defun mind-wave-generate-commit-name ()
   (interactive)
   (message "Git commit name generating...")
-  (mind-wave-call-async "generate_git_commit_name"
+  (mind-wave-call-async "git_commit"
                         default-directory
                         mind-wave-code-role
                         "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns, if the diff content starts with 'Subproject commit', you extract the submodule name 'xxx', and reply 'Update xxx modules'."))
@@ -888,6 +920,19 @@ Your task is to summarize the text I give you in up to seven concise  bulletpoin
      (run-with-timer 1 nil (lambda() (setq-local mind-wave-is-response-p nil)))
      (message end-message)
      )))
+
+(defun mind-wave-change-model ()
+  (interactive)
+  (if (string-equal (file-name-extension (buffer-file-name)) "chat")
+      (let ((model (completing-read "Choose model : " '("gpt-3.5-turbo" "gpt-4" "gpt-4-32k"))))
+        (save-excursion
+          (goto-char (point-min))
+          (if (search-forward-regexp "# : " nil t)
+              (progn
+                (kill-line)
+                (insert model))
+            (insert (format "# : %s\n\n" model)))))
+    (message "Command mind-wave-change-model is only used for *.chat file.")))
 
 (defun mind-wave--update-chat-buffer-to-new-version ()
   "Replace old markers in buffer with new ones."

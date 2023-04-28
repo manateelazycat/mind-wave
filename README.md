@@ -59,6 +59,16 @@ Code-related commands will automatically adjust the window layout, and you can u
 1. Open a video website and execute the command `mind-wave-summary-video`. ChatGPT will automatically retrieve the video subtitles and analyze the summary of the video (YouTube Transcript API installation is required).
 2. Open a text website and execute the command `mind-wave-summary-web`. ChatGPT will automatically retrieve the core content of the webpage and analyze the summary of the webpage (nodejs-readability-cli installation is required).
 
+## Model Selection
+mind-wave defaults to using the `gpt-3.5-turbo` model. If you have already received an internal testing invitation from OpenAI, you can set the following models to `gpt-4` or `gpt-4-32k`.
+
+* mind-wave-chat-model: Chat file conversation model, default is `gpt-3.5-turbo`, you can use the `mind-wave-chat-model` command to switch models
+* mind-wave-async-text-model: Asynchronous text model, default is `gpt-3.5-turbo`
+* mind-wave-action-code-model: Asynchronous code model, default is `gpt-3.5-turbo`
+* mind-wave-explain-word-model: English word explanation model, default is `gpt-3.5-turbo`
+* mind-wave-parse-title-model: Analyze chat file title model, default is `gpt-3.5-turbo`, it is not recommended to switch to `gpt-4`, as `gpt-4` is slower
+* mind-wave-git-commit-model: Generate git diff model, default is `gpt-3.5-turbo`, it is not recommended to switch to `gpt-4`, as `gpt-4` is slower
+
 ## Feedback Issues
 
 Please use the command `emacs -q` and only add the mind-wave configuration for comparison testing. If `emacs -q` can work properly, please check your personal configuration file.
