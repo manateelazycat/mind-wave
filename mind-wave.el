@@ -773,7 +773,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                         "text-mode"
                         (mind-wave--encode-string (nth 2 (mind-wave-get-region-or-buffer)))
                         mind-wave-summary-role
-                        "请检查下面内容的中文错别字。 回答请用 ```'索引': '错别字' - '修改建议'``` 的格式来回答， 其中 '索引' 是指错别字相对于下面内容的行偏移。 如果没有错别字请忽略。 请用中文回答。 "
+                        "请检查下面内容的中文错别字。 如果没有错别字就回答 ’没有错别字‘， 如果有错别字， 请用 ```'索引': '错别字' - '修改建议'``` 的格式来回答， 其中 '索引' 是指错别字相对于下面内容的行偏移。"
                         "typos"
                         "ChatGPT checking..."
                         "ChatGPT check finish."))
