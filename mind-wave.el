@@ -390,11 +390,24 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
 
 (defun mind-wave-chat-ask-with-message (prompt)
   (save-excursion
+    ;; Move to start of buffer.
     (goto-char (point-min))
+
+    ;; Insert model if not found model in beginning of buffer.
     (unless (search-forward-regexp "# : " nil t)
       (goto-char (point-min))
       (insert (format "# : %s\n\n" mind-wave-chat-model)))
 
+    ;; Move to end of buffer.
+    (goto-char (point-max))
+
+    ;; Insert return character if previous line is not blank line.
+    (when (save-excursion
+            (forward-line -1)
+            (split-string (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (insert "\n"))
+
+    ;; Insert prompt.
     (insert "# > User: ")
     (insert (format "%s\n\n" prompt)))
 
