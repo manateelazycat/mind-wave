@@ -588,7 +588,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           translate-start
                           translate-end
                           mind-wave-translate-role
-                          "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax"
+                          "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax, only output translation results, do not output additional instructions."
                           "Translate..."
                           "Translate done"
                           )))
