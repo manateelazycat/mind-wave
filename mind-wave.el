@@ -588,7 +588,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                           translate-start
                           translate-end
                           mind-wave-translate-role
-                          "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax, only output translation results, do not output additional instructions."
+                          "Please translate the following paragraph, if the content includes Markdown content, the translated content should keep the same Markdown syntax, only output translation results, do not output additional instructions, don't add extra punctuation."
                           "Translate..."
                           "Translate done"
                           )))
@@ -797,7 +797,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
   (mind-wave-call-async "git_commit"
                         default-directory
                         mind-wave-code-role
-                        "Please generate a patch title for the following diff content, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns, if the diff content starts with 'Subproject commit', you extract the submodule name 'xxx', and reply 'Update xxx modules'."))
+                        "Please generate a patch title for the following diff content, mainly analyze the content starting with - or + at the beginning of the line, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns, if the diff content starts with 'Subproject commit', you extract the submodule name 'xxx', and reply 'Update xxx modules'."))
 
 (defun mind-wave-generate-commit-name--response (patch-name)
   (when (and (active-minibuffer-window)
