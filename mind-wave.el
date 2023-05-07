@@ -95,7 +95,7 @@
 
 (defcustom mind-wave-api-key-path (expand-file-name (concat user-emacs-directory (file-name-as-directory "mind-wave") "chatgpt_api_key.txt"))
   "The path to store OpenAI API Key."
-  :type 'boolean
+  :type 'string
   :group 'mind-wave)
 
 (defcustom mind-wave-api-base "https://api.openai.com/v1"
