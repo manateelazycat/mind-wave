@@ -346,7 +346,7 @@ Then Mind-Wave will start by gdb, please send new issue with `*mind-wave*' buffe
                                :commands (cons mind-wave-internal-process-prog mind-wave-internal-process-args)
                                :title (mapconcat 'identity (cons mind-wave-internal-process-prog mind-wave-internal-process-args) " ")
                                :port mind-wave-epc-port
-                               :connection (mind-wave-epc-connect "localhost" mind-wave-epc-port)
+                               :connection (mind-wave-epc-connect "127.0.0.1" mind-wave-epc-port)
                                ))
   (mind-wave-epc-init-epc-layer mind-wave-epc-process)
   (setq mind-wave-is-starting nil)
