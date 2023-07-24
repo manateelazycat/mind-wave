@@ -112,9 +112,14 @@ class MindWave:
 
     @catch_exception
     def send_completion_request(self, messages, model="gpt-3.5-turbo"):
-        response = openai.ChatCompletion.create(
-            model = model,
-            messages = messages)
+        if openai.api_type == 'azure':
+            response = openai.ChatCompletion.create(
+                engine = model,
+                messages = messages)
+        else:
+            response = openai.ChatCompletion.create(
+                model = model,
+                messages = messages)
 
         result = ''
         for choice in response.choices:
@@ -124,11 +129,18 @@ class MindWave:
 
     @catch_exception
     def send_stream_request(self, messages, callback, model="gpt-3.5-turbo"):
-        response = openai.ChatCompletion.create(
-            model = model,
-            messages = messages,
-            temperature=0,
-            stream=True)
+        if openai.api_type == 'azure':
+            response = openai.ChatCompletion.create(
+                engine = model,
+                messages = messages,
+                temperature=0,
+                stream=True)
+        else:
+            response = openai.ChatCompletion.create(
+                model = model,
+                messages = messages,
+                temperature=0,
+                stream=True)
 
         for chunk in response:
             (result_type, result_content) = self.get_chunk_result(chunk)
@@ -339,11 +351,18 @@ class MindWave:
                     {"role": "user", "content": f"{prompt}： \n{text}"}]
 
         try:
-            response = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo",
-                messages = messages,
-                temperature=0,
-                stream=True)
+            if openai.api_type == 'azure':
+                response = openai.ChatCompletion.create(
+                    engine = "gpt-3.5-turbo",
+                    messages = messages,
+                    temperature=0,
+                    stream=True)
+            else:
+                response = openai.ChatCompletion.create(
+                    model = "gpt-3.5-turbo",
+                    messages = messages,
+                    temperature=0,
+                    stream=True)
 
             for chunk in response:
                 (result_type, result_content) = self.get_chunk_result(chunk)
