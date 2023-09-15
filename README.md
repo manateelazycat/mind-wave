@@ -8,7 +8,7 @@ As mind-wave is developed based on multithreading technology, ChatGPT will not b
 ## Installation
 1. Register [OpenAI](https://platform.openai.com)
 2. Obtain [OpenAI API Key](https://platform.openai.com/account/api-keys), and save the API Key to the `~/.emacs.d/mind-wave/chatgpt_api_key.txt` file (Or set the environment variable OPENAI_API_KEY.).
-3. Install Python dependencies: `pip3 install openai epc sexpdata six`.
+3. Install Python dependencies: `pip3 install -U openai epc sexpdata six`.
 4. Install [markdown-mode](https://github.com/jrblevin/markdown-mode)
 5. Use `git clone` to download this repository and replace the `load-path` path in the configuration below.
 6. Add the following code to your configuration file `~/.emacs`:
